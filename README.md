@@ -5,5 +5,5 @@ Database: MySQL, Redis
 Backend framework: PHP
 Frontend framework: Html, Css, Javascript
 ## Database
-using given sql file e-learning.sql
+using given sql file [e-learning.sql](doc:e-learning.sql)
 
