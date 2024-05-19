@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  web:
+      image: php:apache
+      container_name: E-learning_web
+      build: ./
+      ports:
+        - 24000:80
+      volumes:
+        - ./E-learning:/var/www/html
+        
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=e-learning
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+      - MYSQL_ROOT_PASSWORD=my_root_password
+    ports:
+      - 3307:3306
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  phpmyadmin:
+    image: phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - 8001:80
+    environment:
+      - MYSQL_ROOT_PASSWORD=my_root_password
+    restart: unless-stopped
+  
