@@ -38,7 +38,7 @@ include("resources/static/html/header.html");
             <div class="cart">
                 <a><i class="fa fa-shopping-cart" style="color: #000; font-size: 54px;float:right;"></i></a>
                 <?php
-                $username = $_SESSION["username"];
+                $username = $user["username"];
                 $sql = "SELECT * FROM cart WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
@@ -58,23 +58,23 @@ include("resources/static/html/header.html");
                         $total += $item['course_price'];
                     ?>
                         <li>
-                            <img src="<?php echo $item['course_img']; ?>">
+                            <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             <h3 style="font-weight: 700">
-                                <a href="/learning.php?course_id=<?php echo $item['course_id']; ?>">
-                                    <?php echo $item['course_title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($item['course_id']); ?>">
+                                    <?php echo htmlspecialchars($item['course_title']); ?>
                                 </a>
                             </h3>
                             <h3 style="font-weight: 400; font-size: 15px">
-                                Author: <?php echo $item['course_author']; ?>
+                                Author: <?php echo htmlspecialchars($item['course_author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $item['course_price']; ?>
+                                Price: <?php echo htmlspecialchars($item['course_price']); ?>
                             </h3>
                             <hr>
                         </li>
                     <?php endforeach; ?>
                     <li>
-                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo $total; ?></h2>
+                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
                         <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
                     </li>
                 </ul>
@@ -219,28 +219,28 @@ include("resources/static/html/header.html");
                     <?php foreach ($cart as $item) : ?>
                         <div class="row">
                             <div class="col-sm-3">
-                                <img src="<?php echo $item['course_img']; ?>">
+                                <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             </div>
                             <div class="col-sm-5">
                                 <h3 class="courses-pay-description" style="font-weight: 700">
                                     <a href="#">
-                                        <?php echo $item['course_title']; ?>
+                                        <?php echo htmlspecialchars($item['course_title']); ?>
                                     </a>
                                 </h3>
                                 <h3 style="font-weight: 400; font-size: 20px">
-                                    Author: <?php echo $item['course_author']; ?>
+                                    Author: <?php echo htmlspecialchars($item['course_author']); ?>
                                 </h3>
                             </div>
                             <div class="col-sm-2" style="font-size: 25px; padding-top:10px">
                                 <form name="paycheck-form" method="post" action="/delete_one_item_in_cart.php">
                                     <button type="submit" style="background-color: #f2fff4;border-style: none; ">
                                         <i class="fa-solid fa-trash-can" style="color:#f02e0c"></i>
-                                        <input type="hidden" name="course_id" value="<?php echo $item['course_id']; ?>">
+                                        <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($item['course_id']); ?>">
                                     </button>
                                 </form>
                             </div>
                             <div class="col-sm-2" style="padding-top:10px">
-                                <h2>$<?php echo $item['course_price']; ?><i class="fa fa-ticket" aria-hidden="true"></i>
+                                <h2>$<?php echo htmlspecialchars($item['course_price']); ?><i class="fa fa-ticket" aria-hidden="true"></i>
                                 </h2>
                             </div>
                         </div>
@@ -249,7 +249,7 @@ include("resources/static/html/header.html");
                 </div>
                 <div class="payment-checkout">
                     <h4>Total</h4>
-                    <h1 style="font-weight: 700;font-size: 35px">$<?php echo $total; ?></h1>
+                    <h1 style="font-weight: 700;font-size: 35px">$<?php echo htmlspecialchars($total); ?></h1>
                     <button type="button" class="pucharse-button" onclick="toggleMenu()">Pucharse</button>
                 </div>
             <?php else : ?>

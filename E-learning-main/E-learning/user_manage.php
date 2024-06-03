@@ -99,13 +99,13 @@ if (strcmp($user['user_role'], "admin") != 0) {
                     <?php foreach ($user_list as $user) : ?>
                         <tr>
                             <form method="POST" action="/user_manage_update.php" enctype="multipart/form-data">
-                                <td><input type="checkbox" name="id" id="<?php echo $user['id']; ?>"></td>
-                                <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                <td><input type="text" id="username-input-<?php echo $user['id']; ?>" value="<?php echo $user['username']; ?>" class="input-profile-field" name="username" disabled></td>
-                                <td><input type="text" id="email-input-<?php echo $user['id']; ?>" value="<?php echo $user['email']; ?>" class="input-profile-field" name="email" disabled></td>
-                                <td><input type="text" id="password-input-<?php echo $user['id']; ?>" value="<?php echo $user['password']; ?>" class="input-profile-field" name="password" disabled></td>
-                                <td><input type="text" id="phone-input-<?php echo $user['id']; ?>" value="<?php echo $user['phone']; ?>" class="input-profile-field" name="phone" disabled></td>
-                                <td><input type="text" id="address-input-<?php echo $user['id']; ?>" value="<?php echo $user['address']; ?>" class="input-profile-field" name="address" disabled></td>
+                                <td><input type="checkbox" name="id" id="<?php echo htmlspecialchars($user['id']); ?>"></td>
+                                <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user['id']); ?>">
+                                <td><input type="text" id="username-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['username']); ?>" class="input-profile-field" name="username" disabled></td>
+                                <td><input type="text" id="email-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['email']); ?>" class="input-profile-field" name="email" disabled></td>
+                                <td><input type="text" id="password-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['password']); ?>" class="input-profile-field" name="password" disabled></td>
+                                <td><input type="text" id="phone-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['phone']); ?>" class="input-profile-field" name="phone" disabled></td>
+                                <td><input type="text" id="address-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['address']); ?>" class="input-profile-field" name="address" disabled></td>
                                 <td><button class="btn btn-xs" id='btn-xs' type='submit'> <i class="fa-solid fa-wrench"></i></button></td>
                             </form>
                         </tr>
@@ -175,9 +175,9 @@ if (strcmp($user['user_role'], "admin") != 0) {
         const notification = document.querySelector(".cart-notification"),
             closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
-        const checkDup = <?php echo $checkDuplicate; ?>;
-        const checkNull = <?php echo $checkNull; ?>;
-        const checkSpecialChar = <?php echo $checkSpecialChar; ?>;
+        const checkDup = <?php echo htmlspecialchars($checkDuplicate); ?>;
+        const checkNull = <?php echo htmlspecialchars($checkNull); ?>;
+        const checkSpecialChar = <?php echo htmlspecialchars($checkSpecialChar); ?>;
         if (checkDup > 0 || checkNull > 0 || checkSpecialChar > 0) {
             const messageDiv = $('.message');
             if (checkDup > 0) {

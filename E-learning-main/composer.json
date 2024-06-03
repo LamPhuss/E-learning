@@ -1,0 +1,8 @@
+{
+    "name": "test/app",
+    "description": "Simple PHP Composer app",
+    "type": "project",
+    "require": {
+      "phpmailer/phpmailer": "^6.9.1"
+    }
+ }

@@ -3,6 +3,7 @@ require 'database.php';
 include('auth.php');
 
 include("resources/static/html/header.html");
+
 ?>
 <html>
 
@@ -35,7 +36,7 @@ include("resources/static/html/header.html");
             <div class="cart">
                 <a><i class="fa fa-shopping-cart" style="color: #000; font-size: 54px;float:right;"></i></a>
                 <?php
-                $username = $_SESSION["username"];
+                $username = $user["username"];
                 $sql = "SELECT * FROM cart WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
@@ -56,23 +57,23 @@ include("resources/static/html/header.html");
                         $total += $item['course_price'];
                     ?>
                         <li>
-                            <img src="<?php echo $item['course_img']; ?>">
+                            <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             <h3 style="font-weight: 700">
-                                <a href="/learning.php?course_id=<?php echo $item['course_id']; ?>">
-                                    <?php echo $item['course_title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($item['course_id']); ?>">
+                                    <?php echo htmlspecialchars($item['course_title']); ?>
                                 </a>
                             </h3>
                             <h3 style="font-weight: 400; font-size: 15px">
-                                Author: <?php echo $item['course_author']; ?>
+                                Author: <?php echo htmlspecialchars($item['course_author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $item['course_price']; ?>
+                                Price: <?php echo htmlspecialchars($item['course_price']); ?>
                             </h3>
                             <hr>
                         </li>
                     <?php endforeach; ?>
                     <li>
-                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo $total; ?></h2>
+                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
                         <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
                     </li>
                 </ul>
@@ -97,12 +98,12 @@ include("resources/static/html/header.html");
             ?>
             <ul class="upload-recent">
                 <?php foreach ($courses_recent as $course) : ?>
-                    <li class="top"><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>" title="<?php echo $course['title']; ?>">
-                            <img loading="lazy" src="<?php echo $course['slide1']; ?>" width="310" height="200"> </a>
+                    <li class="top"><a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>" title="<?php echo htmlspecialchars($course['title']); ?>">
+                            <img loading="lazy" src="<?php echo htmlspecialchars($course['slide1']); ?>" width="310" height="200"> </a>
                         <div class="info">
-                            <h3><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>"><?php echo $course['title']; ?></a></h3>
+                            <h3><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>"><?php echo htmlspecialchars($course['title']); ?></a></h3>
                             <p><?php echo htmlspecialchars($course['description']); ?>.</p>
-                            <p class="time"><a href="#" class="author"><?php echo $course['author']; ?></a> - <a href="/mobile-social.chn" class="categame"></a><?php echo $course['date_created']; ?></p>
+                            <p class="time"><a href="#" class="author"><?php echo htmlspecialchars($course['author']); ?></a> - <a href="/mobile-social.chn" class="categame"></a><?php echo htmlspecialchars($course['date_created']); ?></p>
                         </div>
                     </li>
                 <?php endforeach; ?>
@@ -122,12 +123,12 @@ include("resources/static/html/header.html");
             <ul id="upload-most">
 
                 <?php foreach ($courses_view as $course) : ?>
-                    <li class="top"><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>" title="<?php echo $course['title']; ?>">
-                            <img loading="lazy" src="<?php echo $course['slide1']; ?>" width="310" height="200"> </a>
+                    <li class="top"><a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>" title="<?php echo htmlspecialchars($course['title']); ?>">
+                            <img loading="lazy" src="<?php echo htmlspecialchars($course['slide1']); ?>" width="310" height="200"> </a>
                         <div class="info">
-                            <h3><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>"><?php echo $course['title']; ?></a></h3>
-                            <p><?php echo $course['description']; ?>.</p>
-                            <p class="time"><a href="#" class="author"><?php echo $course['author']; ?></a> - <a href="/mobile-social.chn" class="categame"></a><?php echo $course['date_created']; ?></p>
+                            <h3><a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>"><?php echo htmlspecialchars($course['title']); ?></a></h3>
+                            <p><?php echo htmlspecialchars($course['description']); ?>.</p>
+                            <p class="time"><a href="#" class="author"><?php echo htmlspecialchars($course['author']); ?></a> - <a href="/mobile-social.chn" class="categame"></a><?php echo htmlspecialchars($course['date_created']); ?></p>
                         </div>
                     </li>
                 <?php endforeach; ?>

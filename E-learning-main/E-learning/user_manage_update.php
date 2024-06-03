@@ -62,14 +62,14 @@ function checkDuplicateUsername($conn, $username, $user_id)
 }
 function trimAndCheckNull($string)
 {
-    // Loại bỏ khoảng trắng ở đầu và cuối chuỗi
+
     $trimmedString = trim($string);
 
-    // Kiểm tra xem chuỗi đã được cắt tỉa có null hay khônga
+ 
     if (is_null($trimmedString) || empty($trimmedString)) {
         return null;
     } else {
-        // Trả về chuỗi đã được cắt tỉa và loại bỏ null
+
         return $trimmedString;
     }
 }

@@ -1,36 +1,35 @@
 <?php
 require 'database.php';
 include('auth.php');
-if (strcmp($user['user_role'], "admin") == 0) {
-    if (
-        isset($_POST["old_password"])  && isset($_POST["new_password"])
-    ) {
-        $old_password = $_POST["old_password"];
-        $new_password = $_POST["new_password"];
-        $username = $_SESSION["username"];
-        if (checkOldPass($conn, $username, $old_password)) {
-            $sql = "UPDATE users SET password = ? WHERE username = ?";
-            $stmt = $conn->prepare($sql);
-            if (validation($new_password)) {
-                $new_password_enc = md5($new_password);
-                $stmt->bind_param("ss", $new_password_enc, $username);
-                if ($stmt->execute()) {
-                    echo "<body style='background-color:#f2fff4'><h2>Update success, please reload the page and login again</h2></body>";
-                    session_destroy();
-                    exit;
-                } else {
-                    echo "<h1>Update password error</h1>";
-                }
-            } else {
-                header("Location:user_profile_edit_password.php?wrong_pass_char");
+if (
+    isset($_POST["old_password"])  && isset($_POST["new_password"])
+) {
+    $old_password = $_POST["old_password"];
+    $new_password = $_POST["new_password"];
+    $username = $user["username"];
+    if (checkOldPass($conn, $username, $old_password)) {
+        $sql = "UPDATE users SET password = ? WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        if (validation($new_password)) {
+            $new_password_enc = md5($new_password);
+            $stmt->bind_param("ss", $new_password_enc, $username);
+            if ($stmt->execute()) {
+                echo "<body style='background-color:#f2fff4'><h2>Update success, please reload the page and login again</h2></body>";
+                session_destroy();
                 exit;
+            } else {
+                echo "<h1>Update password error</h1>";
             }
         } else {
-            header("Location:user_profile_edit_password.php?wrong_pass");
+            header("Location:user_profile_edit_password.php?wrong_pass_char");
             exit;
         }
+    } else {
+        header("Location:user_profile_edit_password.php?wrong_pass");
+        exit;
     }
 }
+
 
 function checkOldPass($conn, $username, $old_password)
 {

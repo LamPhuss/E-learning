@@ -2,7 +2,7 @@
 require 'database.php';
 include('auth.php');
 if (isset($_POST["course_id"])) {
-    $username = $_SESSION["username"];
+    $username = $user["username"];
     $course_id = intval($_POST["course_id"]);
     removeOneItem($conn, $course_id, $username);
 }

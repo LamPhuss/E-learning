@@ -6,7 +6,7 @@ if (
     isset($_POST["email"])  && isset($_POST["phone_num"])
     && isset($_POST["address"])
 ) {
-    $username = $_SESSION["username"];
+    $username = $user["username"];
     $email = $_POST["email"];
     $phone = $_POST["phone_num"];
     $address = $_POST["address"];

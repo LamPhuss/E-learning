@@ -60,7 +60,7 @@ if ($notAdded) {
             <div class="cart">
                 <a><i class="fa fa-shopping-cart" style="color: #000; font-size: 54px;float:right;"></i></a>
                 <?php
-                $username = $_SESSION["username"];
+                $username = $user["username"];
                 $sql = "SELECT * FROM cart WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
@@ -84,23 +84,23 @@ if ($notAdded) {
                         endif;
                     ?>
                         <li>
-                            <img src="<?php echo $item['course_img']; ?>">
+                            <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             <h3 style="font-weight: 700">
-                                <a href="/learning.php?course_id=<?php echo $item['course_id']; ?>">
-                                    <?php echo $item['course_title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($item['course_id']); ?>">
+                                    <?php echo htmlspecialchars($item['course_title']); ?>
                                 </a>
                             </h3>
                             <h3 style="font-weight: 400; font-size: 15px">
-                                Author: <?php echo $item['course_author']; ?>
+                                Author: <?php echo htmlspecialchars($item['course_author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $item['course_price']; ?>
+                                Price: <?php echo htmlspecialchars($item['course_price']); ?>
                             </h3>
                             <hr>
                         </li>
                     <?php endforeach; ?>
                     <li>
-                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo $total; ?></h2>
+                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
                         <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
                     </li>
                 </ul>
@@ -126,15 +126,15 @@ if ($notAdded) {
             <div class="image-container">
                 <div class="slide">
                     <div class="slideNumber">1</div>
-                    <img src="<?php echo $course['slide1']; ?>" style="max-height:600px">
+                    <img src="<?php echo htmlspecialchars($course['slide1']); ?>" style="max-height:600px">
                 </div>
                 <div class="slide">
                     <div class="slideNumber">2</div>
-                    <img src="<?php echo $course['slide2']; ?>" style="max-height:600px">
+                    <img src="<?php echo htmlspecialchars($course['slide2']); ?>" style="max-height:600px">
                 </div>
                 <div class="slide">
                     <div class="slideNumber">3</div>
-                    <img src="<?php echo $course['slide3']; ?>" style="max-height:600px">
+                    <img src="<?php echo htmlspecialchars($course['slide3']); ?>" style="max-height:600px">
                 </div>
 
                 <!-- Next and Previous icon to change images -->
@@ -156,34 +156,34 @@ if ($notAdded) {
 
                     <h2 style="padding: 20px; font-weight: 700;">Added to cart</h2>
                     <div class="overlay-detail">
-                        <a href="/learning.php?course_id=<?php echo $course['course_id']; ?>" title="<?php echo $course['title']; ?>">
-                            <img src="<?php echo $course['slide1']; ?>" >
+                        <a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>" title="<?php echo htmlspecialchars($course['title']); ?>">
+                            <img src="<?php echo htmlspecialchars($course['slide1']); ?>" >
                         </a>
                         <div class="overlay-description">
                             <h3 style="font-weight: 400">
-                                <a href="/learning.php?course_id=<?php echo $course['course_id']; ?>">
-                                    <?php echo $course['title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>">
+                                    <?php echo htmlspecialchars($course['title']); ?>
                                 </a>
                             </h3>
                             <h3>
-                                Author: <?php echo $course['author']; ?>
+                                Author: <?php echo htmlspecialchars($course['author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $course['price']; ?>$
+                                Price: <?php echo htmlspecialchars($course['price']); ?>
                             </h3>
                         </div>
                     </div>
                     <form method="post" action="/add_cart.php" id="add_cart_form" onsubmit="return false">
-                        <input type="hidden" name="course_id" value="<?php echo $course['course_id']; ?>">
-                        <input type="hidden" name="course_title" value="<?php echo $course['title']; ?>">
-                        <input type="hidden" name="course_img" value="<?php echo $course['slide1']; ?>">
-                        <input type="hidden" name="course_author" value="<?php echo $course['author']; ?>">
-                        <input type="hidden" name="course_price" value="<?php echo $course['price']; ?>">
+                        <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
+                        <input type="hidden" name="course_title" value="<?php echo htmlspecialchars($course['title']); ?>">
+                        <input type="hidden" name="course_img" value="<?php echo htmlspecialchars($course['slide1']); ?>">
+                        <input type="hidden" name="course_author" value="<?php echo htmlspecialchars($course['author']); ?>">
+                        <input type="hidden" name="course_price" value="<?php echo htmlspecialchars($course['price']); ?>">
                         <button type="submit" class="cart-button-added" id="cart-button-added" onclick='return btnClick();'>Add to cart</button>
                     </form>
                 </div>
             </div>
-            <div class="other-component">
+            <div class="other-component" style="margin-top: -15px;">
                 <button type="button" class="buy-button">Buy now</button>
                 <button type="button" class="cart-button" onclick="toggleAddButton()">Add to cart</button>
             </div>
@@ -260,7 +260,7 @@ if ($notAdded) {
         const notification = document.querySelector(".cart-notification"),
         closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
-        const checkCart = <?php echo $checkAdded; ?>;
+        const checkCart = <?php echo htmlspecialchars($checkAdded); ?>;
         if (checkCart>0){
             notification.classList.add("active");
             progress.classList.add("active");

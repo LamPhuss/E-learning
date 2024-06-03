@@ -1,10 +1,4 @@
 <?php
-session_start();
-
-if (isset($_SESSION["username"])) {
-    header("Location: start.php");
-    exit;
-}
 include("resources/static/html/header.html");
 ?>
 
@@ -23,12 +17,12 @@ include("resources/static/html/header.html");
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>
-                    <h2 style="color: #636363;">Please enter your username</h2>
+                    <h2 style="color: #636363;">Please enter your username and email</h2>
                     <input type="text" placeholder="username" name="username" id="login-username-validation" />
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["uname_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">User Name not found</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">User Name and Email not match</span>
                             <script th:inline="javascript">
                                 $('#login-username-validation').addClass('invalid-blank');
                             </script>
@@ -37,6 +31,15 @@ include("resources/static/html/header.html");
                             <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
                             <script th:inline="javascript">
                                 $('#login-username-validation').addClass('invalid-blank');
+                            </script>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <input type="email" placeholder="abc@xyz" name="email" id="regis-email-validation" />
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
+                        <?php if (isset($_GET["null"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <script th:inline="javascript">
+                                $('#regis-email-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -70,6 +73,17 @@ include("resources/static/html/header.html");
             evt.target.className = 'valid';
         }
     })
+    $('#regis-email-validation').on('input', function(evt) {
+        var value = evt.target.value;
+        $('span#error').remove();
+        if (value.length === 0) {
+            $('#regis-email-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
+            evt.target.className = 'invalid-blank';
+
+        } else {
+            evt.target.className = 'valid';
+        }
+    })
     document.getElementById('login-btn').addEventListener('click', function(event) {
         if ($('#login-username-validation').val().length === 0) {
             $('#login-username-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
@@ -82,7 +96,12 @@ include("resources/static/html/header.html");
                 event.preventDefault();
             }
         }
-        if ($('#login-username-validation').hasClass('invalid-blank')) {
+        if ($('#regis-email-validation').val().length === 0) {
+            $('#regis-email-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
+            $('#regis-email-validation').addClass('invalid-blank');
+            event.preventDefault();
+        }
+        if ($('#login-username-validation').hasClass('invalid-blank') || $('#regis-email-validation').hasClass('invalid-blank') ) {
             event.preventDefault();
         }
     });

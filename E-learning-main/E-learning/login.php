@@ -25,6 +25,7 @@ if (isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST['capt
             if ($result->num_rows == 1) {
                 $row = $result->fetch_assoc();
                 $_SESSION["username"] = $username;
+                $_SESSION['LAST_ACTIVITY'] = time();
                 header("Location: start.php");
                 exit;
             } else {

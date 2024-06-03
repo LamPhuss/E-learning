@@ -24,7 +24,7 @@ include("resources/static/html/header.html");
                         <div class="index-form">
                             <form class="login-form" method="POST" action="/update_password.php" enctype="multipart/form-data">
                                 <h2 style="color: #636363;">Create new password</h2>
-                                <input type="hidden" name="username" value="<?php echo $username ?>" />
+                                <input type="hidden" name="username" value="<?php echo htmlspecialchars($username) ?>" />
                                 <input type="password" placeholder="new password" name="password" id="regis-pass-validation" />
                                 <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                                     <?php if (isset($_GET["special_char"])) : ?>

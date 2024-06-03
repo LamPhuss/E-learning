@@ -2,8 +2,7 @@
 require 'database.php';
 include('auth.php');
 
-$username = $_SESSION["username"];
-
+$username = $user["username"];
 $sql = "SELECT * FROM users WHERE username=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
@@ -93,7 +92,7 @@ include("resources/static/html/header.html");
             <div class="cart">
                 <a><i class="fa fa-shopping-cart" style="color: #000; font-size: 54px;float:right;"></i></a>
                 <?php
-                $username = $_SESSION["username"];
+                $username = $user["username"];
                 $sql = "SELECT * FROM cart WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
@@ -114,23 +113,23 @@ include("resources/static/html/header.html");
                         $total += $item['course_price'];
                     ?>
                         <li>
-                            <img src="<?php echo $item['course_img']; ?>">
+                            <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             <h3 style="font-weight: 700">
-                                <a href="/learning.php?course_id=<?php echo $item['course_id']; ?>">
-                                    <?php echo $item['course_title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($item['course_id']); ?>">
+                                    <?php echo htmlspecialchars($item['course_title']); ?>
                                 </a>
                             </h3>
                             <h3 style="font-weight: 400; font-size: 15px">
-                                Author: <?php echo $item['course_author']; ?>
+                                Author: <?php echo htmlspecialchars($item['course_author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $item['course_price']; ?>
+                                Price: <?php echo htmlspecialchars($item['course_price']); ?>
                             </h3>
                             <hr>
                         </li>
                     <?php endforeach; ?>
                     <li>
-                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo $total; ?></h2>
+                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
                         <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
                     </li>
                 </ul>
@@ -154,28 +153,15 @@ include("resources/static/html/header.html");
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
-                            <img src="<?php echo "/upload/" . $avatar ?>" alt="Admin" class="rounded-circle" width="150">
+                            <img src="<?php echo "/upload/" . htmlspecialchars($avatar) ?>" alt="Admin" class="rounded-circle" width="150">
                             <div class="mt-3">
-                                <h4><?php echo $user_detail["username"] ?></h4>
+                                <h4><?php echo htmlspecialchars($user_detail["username"]) ?></h4>
                                 <p class="text-secondary mb-1">Student</p>
-                                <p class="user-country font-size-sm"><?php echo $user_detail["address"] ?></p>
-                                <form method="post" enctype="multipart/form-data">
-                                    <div class="ht-tm-element custom-file">
-                                        <input type="file" class="custom-file-input" name="file" id="fileInput">
-                                        <label class="custom-file-label">Change avatar</label>
-                                    </div>
-                                    <?php
-                                    if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                                        <?php if (isset($_GET["img_err"])) : ?>
-                                            <span class="blank-message" id="error" style="margin-top: -10px;">Only images are allowed</span>
-                                            <script th:inline="javascript">
-                                                $('#fileInput').addClass('invalid-blank');
-                                            </script>
-                                        <?php endif; ?>
+                                <p class="user-country font-size-sm">
+                                    <?php if(isset($user_detail["address"])) :?>
+                                        <?php echo htmlspecialchars($user_detail["address"]) ?>
                                     <?php endif; ?>
-                                    <hr>
-                                    <button type="submit" class="btn btn-primary d-none">Submit</button>
-                                </form>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -189,7 +175,7 @@ include("resources/static/html/header.html");
                                 <h6 class="mb-0">User Name</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <?php echo $user_detail["username"] ?>
+                                <?php echo htmlspecialchars($user_detail["username"]) ?>
                             </div>
                         </div>
                         <hr>
@@ -198,7 +184,7 @@ include("resources/static/html/header.html");
                                 <h6 class="mb-0">Email</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <?php echo $user_detail["email"] ?>
+                                <?php echo htmlspecialchars($user_detail["email"]) ?>
                             </div>
                         </div>
                         <hr>
@@ -216,7 +202,9 @@ include("resources/static/html/header.html");
                                 <h6 class="mb-0">Phone</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <?php echo $user_detail["phone"] ?>
+                                <?php if(isset($user_detail["phone"])) :?>
+                                    <?php echo htmlspecialchars($user_detail["phone"]) ?>
+                                <?php endif ?>
                             </div>
                         </div>
                         <hr>
@@ -225,7 +213,9 @@ include("resources/static/html/header.html");
                                 <h6 class="mb-0">Address</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <?php echo $user_detail["address"] ?>
+                                <?php if(isset($user_detail["address"])) :?>
+                                    <?php echo htmlspecialchars($user_detail["address"]) ?>
+                                <?php endif ?>
                             </div>
                         </div>
                         <hr>
@@ -236,6 +226,7 @@ include("resources/static/html/header.html");
                         </div>
                     </div>
                 </div>
+                <!--   
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="row">
@@ -272,7 +263,7 @@ include("resources/static/html/header.html");
                         <hr>
 
                     </div>
-                </div>
+                </div>-->
             </div>
 
         </div>
@@ -302,10 +293,11 @@ include("resources/static/html/header.html");
             }
         });
         /* ============================================================== */
+        /*
         const notification = document.querySelector(".cart-notification"),
             closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
-        const checkWrongFile = <?php echo $checkWrongFile; ?>;
+        const checkWrongFile =
         if (checkWrongFile > 0) {
             const messageDiv = $('.message');
             const wrongFileMsg = $("<span class='text'>Wrong image format</span>");
@@ -326,7 +318,7 @@ include("resources/static/html/header.html");
             setTimeout(() => {
                 progress.classList.remove("active");
             }, 300);
-        });
+        });*/
     </script>
 </body>
 

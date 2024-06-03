@@ -5,10 +5,17 @@ services:
       container_name: E-learning_web
       build: ./
       ports:
-        - 24000:80
+        - 8001:80
       volumes:
         - ./E-learning:/var/www/html
-        
+        - /var/www/html/vendor/
+      environment:
+        MYSQL_HOST: db
+        MYSQL_DATABASE: e-learning
+        MYSQL_USER: admin
+        MYSQL_PASSWORD: password
+        MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        MYSQL_ROOT_PASSWORD: my_root_password
   db:
     image: mysql:latest
     environment:
@@ -30,8 +37,16 @@ services:
     depends_on:
       - db
     ports:
-      - 8001:80
+      - 8002:80
     environment:
       - MYSQL_ROOT_PASSWORD=my_root_password
     restart: unless-stopped
   
+  proxy:
+    container_name: proxy-server
+    ports:
+      - 8003:80
+    image: nginx:stable
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: always

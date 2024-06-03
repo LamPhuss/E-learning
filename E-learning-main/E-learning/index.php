@@ -1,10 +1,5 @@
 <?php
 require_once 'captcha/Captcha_verify.php';
-
-if (isset($_SESSION["username"])) {
-    header("Location: start.php");
-    exit;
-}
 include("resources/static/html/header.html");
 ?>
 
@@ -48,6 +43,12 @@ include("resources/static/html/header.html");
                         <?php endif; ?>
                         <?php if (isset($_GET["null"])) : ?>
                             <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <script th:inline="javascript">
+                                $('#regis-pass-validation').addClass('invalid-blank');
+                            </script>
+                        <?php endif; ?>
+                        <?php if (isset($_GET["too_small"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">Password must contain at least 8 characters</span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
@@ -211,8 +212,8 @@ include("resources/static/html/header.html");
     $('#regis-pass-validation').on('input', function(evt) {
         var value = evt.target.value;
         $('span#error').remove();
-        if (value.length === 0) {
-            $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
+        if (value.length < 8) {
+            $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Password must contain at least 8 characters</span>');
             evt.target.className = 'invalid-blank';
 
         } else {
@@ -269,8 +270,8 @@ include("resources/static/html/header.html");
         }
     });
     document.getElementById('register-btn').addEventListener('click', function(event) {
-        if ($('#regis-pass-validation').val().length === 0) {
-            $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
+        if ($('#regis-pass-validation').val().length < 8 ) {
+            $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Password must contain at least 8 characters</span>');
             $('#regis-pass-validation').addClass('invalid-blank');
             event.preventDefault();
         } else {

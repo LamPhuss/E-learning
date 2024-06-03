@@ -155,12 +155,12 @@ include("resources/static/html/header.html");
                 ?>
                 <ul id="fistUpload1">
                     <?php foreach ($current_courses as $course) : ?>
-                        <li class="top"><a href="/learning.php?course_id=<?php echo $course['course_id']; ?>" title="<?php echo $course['title']; ?>">
-                                <img loading="lazy" src="<?php echo $course['slide1']; ?>" alt="<?php echo $course['title']; ?>" width="310" height="200"> </a>
+                        <li class="top"><a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>" title="<?php echo htmlspecialchars($course['title']); ?>">
+                                <img loading="lazy" src="<?php echo htmlspecialchars($course['slide1']); ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" width="310" height="200"> </a>
                             <div class="info">
-                                <h3><a title="<?php echo $course['title']; ?>" href="/learning.php?course_id=<?php echo $course['course_id']; ?>"><?php echo $course['title']; ?></a></h3>
+                                <h3><a title="<?php echo htmlspecialchars($course['title']); ?>" href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>"><?php echo htmlspecialchars($course['title']); ?></a></h3>
                                 <p><?php echo htmlspecialchars($course['description']); ?>.</p>
-                                <p class="time"><a href="#" class="author"><?php echo $course['author']; ?></a> - <a href="" class="categame"></a><?php echo $course['date_created']; ?></p>
+                                <p class="time"><a href="#" class="author"><?php echo htmlspecialchars($course['author']); ?></a> - <a href="" class="categame"></a><?php echo htmlspecialchars($course['date_created']); ?></p>
                             </div>
                         </li>
                     <?php endforeach; ?>
@@ -187,9 +187,9 @@ include("resources/static/html/header.html");
                             for ($i = 1; $i <= $total_pages; $i++) :
                             ?>
                                 <?php if ($i == $page_number) : ?>
-                                    <span aria-current="page" class="page-numbers current"><?php echo $i; ?></span>
+                                    <span aria-current="page" class="page-numbers current"><?php echo htmlspecialchars($i); ?></span>
                                 <?php else : ?>
-                                    <a class="page-numbers" href="javascript:;"><?php echo $i; ?></a>
+                                    <a class="page-numbers" href="javascript:;"><?php echo htmlspecialchars($i); ?></a>
                                 <?php endif; ?>
                             <?php endfor; ?>
                         <?php else : ?>
@@ -198,9 +198,9 @@ include("resources/static/html/header.html");
                                 for ($i = 1; $i <= $page_number + 4; $i++) :
                                 ?>
                                     <?php if ($i == $page_number) : ?>
-                                        <span aria-current="page" class="page-numbers current"><?php echo $i; ?></span>
+                                        <span aria-current="page" class="page-numbers current"><?php echo htmlspecialchars($i); ?></span>
                                     <?php else : ?>
-                                        <a class="page-numbers" href="javascript:;"><?php echo $i; ?></a>
+                                        <a class="page-numbers" href="javascript:;"><?php echo htmlspecialchars($i); ?></a>
                                     <?php endif; ?>
                                 <?php endfor; ?>
                                 <a class="next-page page-numbers" href="javascript:;">Last</a>
@@ -208,18 +208,18 @@ include("resources/static/html/header.html");
                                 <a class="prev-page page-numbers" href="javascript:;">First</a>
                                 <?php for ($i = $page_number; $i <= $total_pages; $i++) : ?>
                                     <?php if ($i == $page_number) : ?>
-                                        <span aria-current="page" class="page-numbers current"><?php echo $i; ?></span>
+                                        <span aria-current="page" class="page-numbers current"><?php echo htmlspecialchars($i); ?></span>
                                     <?php else : ?>
-                                        <a class="page-numbers" href="javascript:;"><?php echo $i; ?></a>
+                                        <a class="page-numbers" href="javascript:;"><?php echo htmlspecialchars($i); ?></a>
                                     <?php endif; ?>
                                 <?php endfor; ?>
                             <?php else : ?>
                                 <a class="prev-page page-numbers" href="javascript:;">First</a>
                                 <?php for ($i = $page_number - 2; $i <= $page_number + 2; $i++) : ?>
                                     <?php if ($i == $page_number) : ?>
-                                        <span aria-current="page" class="page-numbers current"><?php echo $i; ?></span>
+                                        <span aria-current="page" class="page-numbers current"><?php echo htmlspecialchars($i); ?></span>
                                     <?php else : ?>
-                                        <a class="page-numbers" href="javascript:;"><?php echo $i; ?></a>
+                                        <a class="page-numbers" href="javascript:;"><?php echo htmlspecialchars($i); ?></a>
                                     <?php endif; ?>
                                 <?php endfor; ?>
                             <?php endif; ?>

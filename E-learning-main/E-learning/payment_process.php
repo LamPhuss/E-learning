@@ -10,7 +10,7 @@ if (
     header("Location: start.php");
     exit;
 }
-$username = $_SESSION["username"];
+$username = $user["username"];
 include("resources/static/html/header.html");
 ?>
 <html>
@@ -46,13 +46,12 @@ include("resources/static/html/header.html");
             <h3 style="display:inline-block"> Return</h3>
         </a>
         <?php
-
+        require './vendor/autoload.php';
         use PHPMailer\PHPMailer\PHPMailer;
-        use PHPMailer\PHPMailer\SMTP;
 
-        require 'phpmailer/src/Exception.php';
-        require 'phpmailer/src/PHPMailer.php';
-        require 'phpmailer/src/SMTP.php';
+        require './vendor/phpmailer/phpmailer/src/Exception.php';
+        require './vendor/phpmailer/phpmailer/src/PHPMailer.php';
+        require './vendor/phpmailer/phpmailer/src/SMTP.php';
         $mail = new PHPMailer(true);
 
 

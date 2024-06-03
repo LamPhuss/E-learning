@@ -97,19 +97,19 @@ if (strcmp($user['user_role'], "admin") != 0) {
                     <?php foreach ($courses_list as $course) : ?>
                         <tr>
                             <form method="POST" action="/course_manage_update.php" enctype="multipart/form-data">
-                                <td><input type="checkbox" name="id" id="<?php echo $course['course_id']; ?>"></td>
-                                <input type="hidden" name="course_id" value="<?php echo $course['course_id']; ?>">
-                                <td><input type="text" id="title-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['title']; ?>" class="input-profile-field" name="title" disabled></td>
-                                <td><input type="text" id="description-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['description']; ?>" class="input-profile-field" name="course_description" disabled></td>
-                                <td><input type="text" id="detail-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['detail']; ?>" class="input-profile-field" name="course_detail" disabled></td>
-                                <td><input type="text" id="slide1-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['slide1']; ?>" class="input-profile-field" name="course_slide1" disabled></td>
-                                <td><input type="text" id="slide2-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['slide2']; ?>" class="input-profile-field" name="course_slide2" disabled></td>
-                                <td><input type="text" id="slide3-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['slide3']; ?>" class="input-profile-field" name="course_slide3" disabled></td>
-                                <td><input type="text" id="author-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['author']; ?>" class="input-profile-field" name="course_author" disabled></td>
-                                <td><input type="text" id="date-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['date_created']; ?>" class="input-profile-field" name="course_date" disabled></td>
-                                <td><input type="text" id="link-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['download_link']; ?>" class="input-profile-field" name="course_link" disabled></td>
-                                <td><input type="text" id="price-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['price']; ?>" class="input-profile-field" name="course_price" disabled></td>
-                                <td><input type="text" id="view-input-<?php echo $course['course_id']; ?>" value="<?php echo $course['view']; ?>" class="input-profile-field" name="course_view" disabled></td>
+                                <td><input type="checkbox" name="id" id="<?php echo htmlspecialchars($course['course_id']); ?>"></td>
+                                <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
+                                <td><input type="text" id="title-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['title']); ?>" class="input-profile-field" name="title" disabled></td>
+                                <td><input type="text" id="description-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['description']); ?>" class="input-profile-field" name="course_description" disabled></td>
+                                <td><input type="text" id="detail-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['detail']); ?>" class="input-profile-field" name="course_detail" disabled></td>
+                                <td><input type="text" id="slide1-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['slide1']); ?>" class="input-profile-field" name="course_slide1" disabled></td>
+                                <td><input type="text" id="slide2-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['slide2']); ?>" class="input-profile-field" name="course_slide2" disabled></td>
+                                <td><input type="text" id="slide3-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['slide3']); ?>" class="input-profile-field" name="course_slide3" disabled></td>
+                                <td><input type="text" id="author-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['author']); ?>" class="input-profile-field" name="course_author" disabled></td>
+                                <td><input type="text" id="date-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['date_created']); ?>" class="input-profile-field" name="course_date" disabled></td>
+                                <td><input type="text" id="link-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['download_link']); ?>" class="input-profile-field" name="course_link" disabled></td>
+                                <td><input type="text" id="price-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['price']); ?>" class="input-profile-field" name="course_price" disabled></td>
+                                <td><input type="text" id="view-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['view']); ?>" class="input-profile-field" name="course_view" disabled></td>
                                 <td><button class="btn btn-xs" id='btn-xs' type='submit'> <i class="fa-solid fa-wrench"></i></button></td>
                             </form>
                         </tr>
@@ -162,8 +162,8 @@ if (strcmp($user['user_role'], "admin") != 0) {
         const notification = document.querySelector(".cart-notification"),
             closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
-        const checkDup = <?php echo $checkDuplicate; ?>;
-        const checkNull = <?php echo $checkNull; ?>;
+        const checkDup = <?php echo htmlspecialchars($checkDuplicate); ?>;
+        const checkNull = <?php echo htmlspecialchars($checkNull); ?>;
         if (checkDup > 0 || checkNull > 0) {
             const messageDiv = $('.message');
             if (checkDup > 0) {

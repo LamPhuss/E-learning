@@ -6,7 +6,7 @@ if (
     isset($_POST["course_id"])  && isset($_POST["course_title"])
     && isset($_POST["course_img"]) && isset($_POST["course_author"]) && isset($_POST["course_price"])
 ) {
-    $username = $_SESSION["username"];
+    $username = $user["username"];
     $course_id = intval($_POST["course_id"]);
     $course_title = $_POST["course_title"];
     $course_img = $_POST["course_img"];
@@ -38,12 +38,7 @@ function checkValidCourse($conn, $course_id, $course_title, $course_img, $course
 
     $sql = "SELECT * FROM courses WHERE course_id=? AND title=? AND slide1=? AND author=? AND price=? ";
     $stmt = $conn->prepare($sql);
-    /*
-    var_dump($course_id);
-    var_dump($course_title);
-    var_dump($course_img);
-    var_dump($course_author);
-    var_dump($course_price);*/
+
     $stmt->bind_param("isssd", $course_id, $course_title, $course_img, $course_author, $course_price);
 
     $stmt->execute();

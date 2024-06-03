@@ -1,9 +1,7 @@
 <?php
 require 'database.php';
 include('auth.php');
-include("resources/static/html/header.html");
-
-$username = $_SESSION["username"];
+$username = $user["username"];
 $sql = "SELECT * FROM users WHERE username=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
@@ -14,7 +12,7 @@ if ($result->num_rows == 1) {
 } else {
     echo "<h1>404</h1>";
 }
-//var_dump(strcmp($user_role['user_role'],"user")==0);
+
 $dir = '/var/www/html/upload/';
 $avatar = null;
 if (!file_exists($dir)) {
@@ -53,6 +51,15 @@ if (isset($_FILES["file"])) {
 if (is_null($avatar)) {
     $avatar = "default.jpg";
 }
+
+$wrongFile = isset($_GET["img_err"]) ? true : false;
+$checkWrongFile = 0;
+if ($wrongFile) {
+    $checkWrongFile = 1;
+}
+
+include("resources/static/html/header.html");
+
 ?>
 <html>
 
@@ -84,7 +91,7 @@ if (is_null($avatar)) {
             <div class="cart">
                 <a><i class="fa fa-shopping-cart" style="color: #000; font-size: 54px;float:right;"></i></a>
                 <?php
-                $username = $_SESSION["username"];
+                $username = $user["username"];
                 $sql = "SELECT * FROM cart WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
@@ -105,23 +112,23 @@ if (is_null($avatar)) {
                         $total += $item['course_price'];
                     ?>
                         <li>
-                            <img src="<?php echo $item['course_img']; ?>">
+                            <img src="<?php echo htmlspecialchars($item['course_img']); ?>">
                             <h3 style="font-weight: 700">
-                                <a href="/learning.php?course_id=<?php echo $item['course_id']; ?>">
-                                    <?php echo $item['course_title']; ?>
+                                <a href="/learning.php?course_id=<?php echo htmlspecialchars($item['course_id']); ?>">
+                                    <?php echo htmlspecialchars($item['course_title']); ?>
                                 </a>
                             </h3>
                             <h3 style="font-weight: 400; font-size: 15px">
-                                Author: <?php echo $item['course_author']; ?>
+                                Author: <?php echo htmlspecialchars($item['course_author']); ?>
                             </h3>
                             <h3>
-                                Price: <?php echo $item['course_price']; ?>
+                                Price: <?php echo htmlspecialchars($item['course_price']); ?>
                             </h3>
                             <hr>
                         </li>
                     <?php endforeach; ?>
                     <li>
-                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo $total; ?></h2>
+                        <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
                         <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
                     </li>
                 </ul>
@@ -130,18 +137,18 @@ if (is_null($avatar)) {
         </div>
     </header>
     <div class="cart-notification-container">
-            <div class="cart-notification">
-                <div class="cart-notification-content">
-                    <div class="message">
-                    </div>
+        <div class="cart-notification">
+            <div class="cart-notification-content">
+                <div class="message">
                 </div>
-                <i class="fa-solid fa-xmark close"></i>
-                <div class="progress"></div>
             </div>
+            <i class="fa-solid fa-xmark close"></i>
+            <div class="progress"></div>
         </div>
+    </div>
     <div class="container">
         <div class="overlay" id="overlay">
-            <div class="overlay-panel" id="overlay-panel" style="width: 500px;margin-left:1000px">
+            <div class="overlay-panel" id="overlay-panel" style="width: 500px;margin-left:870px">
                 <iframe name="headerframe" width="100%" height="550px" frameborder="0" src="user_profile_edit_password.php"></iframe>
             </div>
         </div>
@@ -151,17 +158,29 @@ if (is_null($avatar)) {
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
-                            <img src="<?php echo "/upload/" . $avatar ?>" alt="Admin" class="rounded-circle" width="150">
+                            <img src="<?php echo "/upload/" . htmlspecialchars($avatar) ?>" alt="Admin" class="rounded-circle" width="150">
                             <div class="mt-3">
                                 <h4>Hapi hapi hapi</h4>
                                 <p class="text-secondary mb-1">Student</p>
-                                <p class="user-country font-size-sm">Viet Nam</p>
+                                <p class="user-country font-size-sm">
+                                    <?php if (isset($user_detail["address"])) : ?>
+                                        <?php echo htmlspecialchars($user_detail["address"]) ?>
+                                    <?php endif ?>
+                                </p>
                                 <form method="post" enctype="multipart/form-data">
                                     <div class="ht-tm-element custom-file">
                                         <input type="file" class="custom-file-input" name="file" id="fileInput">
                                         <label class="custom-file-label">Change avatar</label>
                                     </div>
-
+                                    <?php
+                                    if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
+                                        <?php if (isset($_GET["img_err"])) : ?>
+                                            <span class="blank-message" id="error" style="margin-top: -10px;">Only images are allowed</span>
+                                            <script th:inline="javascript">
+                                                $('#fileInput').addClass('invalid-blank');
+                                            </script>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
                                     <hr>
                                     <button type="submit" class="btn btn-primary d-none">Submit</button>
                                 </form>
@@ -179,7 +198,7 @@ if (is_null($avatar)) {
                                     <h6 class="mb-0">User Name</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <?php echo $user_detail["username"] ?>
+                                    <?php echo htmlspecialchars($user_detail["username"]) ?>
                                 </div>
                             </div>
                             <hr>
@@ -188,7 +207,7 @@ if (is_null($avatar)) {
                                     <h6 class="mb-0">Email</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php echo $user_detail["email"] ?>" class="input-profile-field" name="email">
+                                    <input type="text" value="<?php echo htmlspecialchars($user_detail["email"]) ?>" class="input-profile-field" name="email">
                                 </div>
                             </div>
                             <hr>
@@ -198,7 +217,7 @@ if (is_null($avatar)) {
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     **********
-                                    <h1 class="btn btn-change " onclick="toggleMenu()">Confirm</h1>
+                                    <h1 class="btn btn-change" onclick="toggleMenu()">Change Password</h1>
                                 </div>
                             </div>
                             <hr>
@@ -207,7 +226,7 @@ if (is_null($avatar)) {
                                     <h6 class="mb-0">Phone</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php echo $user_detail["phone"] ?>" class="input-profile-field" name="phone_num">
+                                    <input type="text" value="<?php if(isset($user_detail["phone"])) :?><?php echo htmlspecialchars($user_detail["phone"]) ?><?php endif ?>" class="input-profile-field" name="phone_num">
                                 </div>
                             </div>
                             <hr>
@@ -216,19 +235,19 @@ if (is_null($avatar)) {
                                     <h6 class="mb-0">Address</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php echo $user_detail["address"] ?>" class="input-profile-field" name="address">
+                                    <input type="text" value="<?php if (isset($user_detail["address"])) : ?><?php echo htmlspecialchars($user_detail["address"]) ?><?php endif ?>" class="input-profile-field" name="address">
                                 </div>
                             </div>
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button class="btn btn-info " type="submit">Confirm</button>
+                                    <button class="btn btn-info" type="submit">Confirm</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
-
+                <!--                           
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="row">
@@ -265,7 +284,7 @@ if (is_null($avatar)) {
                         <hr>
 
                     </div>
-                </div>
+                </div>-->
             </div>
 
         </div>
@@ -301,6 +320,7 @@ if (is_null($avatar)) {
         function toggleMenu() {
             document.getElementById("overlay").classList.toggle("show1")
         }
+
         window.onclick = (event) => {
             if (!event.target.matches('.btn-change')) {
                 if (menu.classList.contains("show1")) {
@@ -315,7 +335,7 @@ if (is_null($avatar)) {
         const notification = document.querySelector(".cart-notification"),
             closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
-        const checkWrongFile = <?php echo $checkWrongFile; ?>;
+        const checkWrongFile = <?php echo htmlspecialchars($checkWrongFile); ?>;
         if (checkWrongFile > 0) {
             const messageDiv = $('.message');
             const wrongFileMsg = $("<span class='text'>Wrong image format</span>");

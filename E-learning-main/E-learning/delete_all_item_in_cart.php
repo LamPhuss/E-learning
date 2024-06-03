@@ -2,7 +2,7 @@
 require 'database.php';
 include('auth.php');
 
-$username = $_SESSION["username"];
+$username = $user["username"];
 
 removeAllItem($conn, $username);
 
