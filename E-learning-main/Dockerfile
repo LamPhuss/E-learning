@@ -24,9 +24,18 @@ RUN composer install
 #RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     #git \
     #&& rm -rf /var/lib/apt/lists/*
+# Enable SSL
 
+RUN set -eux; \
+    apt-get update; \
+    apt-get install ssl-cert; \
+    a2enmod ssl; \
+    a2ensite default-ssl
+EXPOSE 80
+EXPOSE 443
 # config permission
 RUN chown -R root:www-data /var/www/html
 RUN chmod 750 /var/www/html
 RUN find . -type f -exec chmod 640 {} \;
 RUN find . -type d -exec chmod 750 {} \;
+

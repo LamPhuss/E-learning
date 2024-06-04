@@ -5,7 +5,8 @@ services:
       container_name: E-learning_web
       build: ./
       ports:
-        - 8001:80
+        - 80:80
+        - 443:443
       volumes:
         - ./E-learning:/var/www/html
         - /var/www/html/vendor/
