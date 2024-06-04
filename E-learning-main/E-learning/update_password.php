@@ -2,38 +2,39 @@
 require "database.php";
 include 'validation.php';
 require 'redis.php';
-if (isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["confirm_password"])) {
-    $username = $_POST["username"];
+if (isset($_POST["userId"]) && isset($_POST["password"]) && isset($_POST["confirm_password"])) {
+    $userId = $_POST["userId"];
     $password = $_POST["password"];
     $confirm_password = $_POST["confirm_password"];
     $enc_password = md5($confirm_password);
-    $key = $redis->get($username);
+    $key = $redis->get($userId);
     if (!validation($password, $confirm_password)) {
-        header("Location: handle_forgot_password.php?p=" . $username . "&&v=" . $key . "&&special_char");
+        header("Location: handle_forgot_password.php?p=" . $userId . "&&v=" . $key . "&&special_char");
         exit;
     }
     $password = trimAndCheckNull($password);
     $confirm_password = trimAndCheckNull($confirm_password);
-    $username = trimAndCheckNull($username);
-    if (!is_null($password) || !is_null($confirm_password) || !is_null($username)) {
+    $userId = $userId;
+    if (!is_null($password) && !is_null($confirm_password) && $userId>0) {
         if ($confirm_password === $password) {
-            $sql = "UPDATE users SET password = ? WHERE username = ?";
+            $sql = "UPDATE users SET password = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $password_enc = md5($password);
-            $stmt->bind_param("ss", $password_enc, $username);
+            $stmt->bind_param("si", $password_enc, $userId);
             if ($stmt->execute()) {
                 $error = 0;
                 header("Location: index.php?update_pass");
+                $redis->del($userId);
                 exit;
             } else {
                 echo "<h1>Update error</h1>";
             }
         } else {
-            header("Location: handle_forgot_password.php?p=" . $username . "&&v=" . $key . "&&not_match");
+            header("Location: handle_forgot_password.php?p=" . $userId . "&&v=" . $key . "&&not_match");
             exit;
         }
     } else {
-        header("Location: handle_forgot_password.php?p=" . $username . "&&v=" . $key . "&&null");
+        header("Location: handle_forgot_password.php?p=" . $userId . "&&v=" . $key . "&&null");
         exit;
     }
 }
@@ -46,15 +47,15 @@ function trimAndCheckNull($string)
         return $trimmedString;
     }
 }
-function checkValid($conn, $username)
+function checkValid($conn, $userId)
 {
 
 
-    $sql = "SELECT * FROM `users` WHERE username=?";
+    $sql = "SELECT * FROM `users` WHERE id=?";
     $stmt = $conn->prepare($sql);
 
 
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("i", $userId);
 
 
     $stmt->execute();

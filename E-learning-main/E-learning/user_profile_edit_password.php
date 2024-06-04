@@ -1,31 +1,38 @@
 <?php
 require 'database.php';
 include('auth.php');
+include('csrfTokenHandle.php');
 if (
-    isset($_POST["old_password"])  && isset($_POST["new_password"])
+    isset($_POST["old_password"])  && isset($_POST["new_password"]) && isset($_POST["csrfToken"])
 ) {
     $old_password = $_POST["old_password"];
     $new_password = $_POST["new_password"];
+    $clientToken = $_POST["csrfToken"];
     $username = $user["username"];
-    if (checkOldPass($conn, $username, $old_password)) {
-        $sql = "UPDATE users SET password = ? WHERE username = ?";
-        $stmt = $conn->prepare($sql);
-        if (validation($new_password)) {
-            $new_password_enc = md5($new_password);
-            $stmt->bind_param("ss", $new_password_enc, $username);
-            if ($stmt->execute()) {
-                echo "<body style='background-color:#f2fff4'><h2>Update success, please reload the page and login again</h2></body>";
-                session_destroy();
-                exit;
+    if (checkToken($clientToken, $username, $redis)) {
+        if (checkOldPass($conn, $username, $old_password)) {
+            $sql = "UPDATE users SET password = ? WHERE username = ?";
+            $stmt = $conn->prepare($sql);
+            if (validation($new_password)) {
+                $new_password_enc = md5($new_password);
+                $stmt->bind_param("ss", $new_password_enc, $username);
+                if ($stmt->execute()) {
+                    echo "<body style='background-color:#f2fff4'><h2>Update success, please reload the page and login again</h2></body>";
+                    session_destroy();
+                    exit;
+                } else {
+                    echo "<h1>Update password error</h1>";
+                }
             } else {
-                echo "<h1>Update password error</h1>";
+                header("Location:user_profile_edit_password.php?wrong_pass_char");
+                exit;
             }
         } else {
-            header("Location:user_profile_edit_password.php?wrong_pass_char");
+            header("Location:user_profile_edit_password.php?wrong_pass");
             exit;
         }
     } else {
-        header("Location:user_profile_edit_password.php?wrong_pass");
+        header("Location:index.php");
         exit;
     }
 }
@@ -55,6 +62,8 @@ function validation($password)
         return true;
     }
 }
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 include("resources/static/html/header.html");
 
 ?>
@@ -64,7 +73,7 @@ include("resources/static/html/header.html");
     <h2 style="padding: 20px 20px 0px 20px; font-weight: 700;">Change password</h2>
     <form method="post" enctype="multipart/form-data" id="add_cart_form" onsubmit="return validateForm()">
         <div class="payment-checkout-container">
-
+            <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
             <div class="cart-detail">
                 <h4>
                     Old password

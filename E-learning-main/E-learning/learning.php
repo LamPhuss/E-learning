@@ -20,8 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         exit;
     }
     $notAdded = isset($_GET["not_added"]) ? true : false;
-
 }
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 include("resources/static/html/header.html");
 
 $checkAdded = 0;
@@ -34,23 +35,23 @@ if ($notAdded) {
 <body>
     <header>
         <div class="main-header">
-        <ul class="nav-list">
-            <li class="nav-item"><a href="/start.php">Home</a></li>
-            <li class="nav-item"><a href="/search_course.php?course_title=&page=1">Searching</a></li>
-            <?php if (strcmp($user['user_role'], "admin") == 0) : ?>
-                <li class="nav-item">
-                    <a href="#">Manage</a>
-                    <ul class="subnav">
-                        <li>
-                        <a href="/user_manage.php">Users</a>
-                        </li>
-                        <li>
-                            <a href="/course_manage.php">Courses</a>
-                        </li>
-                    </ul>
-                </li>
-            <?php endif; ?>
-        </ul>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/start.php">Home</a></li>
+                <li class="nav-item"><a href="/search_course.php?course_title=&page=1">Searching</a></li>
+                <?php if (strcmp($user['user_role'], "admin") == 0) : ?>
+                    <li class="nav-item">
+                        <a href="#">Manage</a>
+                        <ul class="subnav">
+                            <li>
+                                <a href="/user_manage.php">Users</a>
+                            </li>
+                            <li>
+                                <a href="/course_manage.php">Courses</a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+            </ul>
             <div class="user-profile">
                 <a href="/user_profile.php">
                     PP
@@ -109,18 +110,18 @@ if ($notAdded) {
         </div>
     </header>
     <div class="cart-notification-container">
-    <div class="cart-notification">
-        <div class="cart-notification-content">
+        <div class="cart-notification">
+            <div class="cart-notification-content">
 
-            <div class="message">
-                <span class="text ">This course is already in the cart</span>
+                <div class="message">
+                    <span class="text ">This course is already in the cart</span>
+                </div>
             </div>
+            <i class="fa-solid fa-xmark close"></i>
+            <div class="progress"></div>
         </div>
-        <i class="fa-solid fa-xmark close"></i>
-        <div class="progress"></div>
     </div>
-    </div>
-    <div class="container">
+    <div class="container" style="margin:0 , padding 0">
         <div id="learning-panel">
             <h1 class="learning-header">HTML Tutorial</h1>
             <div class="image-container">
@@ -157,7 +158,7 @@ if ($notAdded) {
                     <h2 style="padding: 20px; font-weight: 700;">Added to cart</h2>
                     <div class="overlay-detail">
                         <a href="/learning.php?course_id=<?php echo htmlspecialchars($course['course_id']); ?>" title="<?php echo htmlspecialchars($course['title']); ?>">
-                            <img src="<?php echo htmlspecialchars($course['slide1']); ?>" >
+                            <img src="<?php echo htmlspecialchars($course['slide1']); ?>">
                         </a>
                         <div class="overlay-description">
                             <h3 style="font-weight: 400">
@@ -174,6 +175,7 @@ if ($notAdded) {
                         </div>
                     </div>
                     <form method="post" action="/add_cart.php" id="add_cart_form" onsubmit="return false">
+                        <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                         <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
                         <input type="hidden" name="course_title" value="<?php echo htmlspecialchars($course['title']); ?>">
                         <input type="hidden" name="course_img" value="<?php echo htmlspecialchars($course['slide1']); ?>">
@@ -184,16 +186,15 @@ if ($notAdded) {
                 </div>
             </div>
             <div class="other-component" style="margin-top: -15px;">
-                <button type="button" class="buy-button">Buy now</button>
                 <button type="button" class="cart-button" onclick="toggleAddButton()">Add to cart</button>
             </div>
 
         </div>
-    </div>
-    <div class="footer">
-    <span><a href="logout.php" style="font-size: 20px;">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></a></span><br>
-        <span><i class="fa fa-pencil-square-o"></i> Contact</span><a href="#"></a><br>
+        <div class="footer">
+            <span><a href="logout.php" style="font-size: 20px;">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></a></span><br>
+            <span><i class="fa fa-pencil-square-o"></i> Contact</span><a href="#"></a><br>
 
+        </div>
     </div>
     <script th:inline="javascript">
         var cartIcon = document.querySelector(".fa-shopping-cart");
@@ -258,25 +259,25 @@ if ($notAdded) {
         /*===========================================================*/
 
         const notification = document.querySelector(".cart-notification"),
-        closeIcon = document.querySelector(".close"),
+            closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
         const checkCart = <?php echo htmlspecialchars($checkAdded); ?>;
-        if (checkCart>0){
+        if (checkCart > 0) {
             notification.classList.add("active");
             progress.classList.add("active");
-            
-            setTimeout(() =>{
-              notification.classList.remove("active");
+
+            setTimeout(() => {
+                notification.classList.remove("active");
             }, 5000);
-            setTimeout(() =>{
-              progress.classList.remove("active");
+            setTimeout(() => {
+                progress.classList.remove("active");
             }, 5300);
         }
         closeIcon.addEventListener("click", () => {
             notification.classList.remove("active");
-            
-            setTimeout(() =>{
-              progress.classList.remove("active");
+
+            setTimeout(() => {
+                progress.classList.remove("active");
             }, 300);
         });
     </script>

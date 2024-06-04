@@ -84,7 +84,19 @@ include("resources/static/html/header.html");
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>
-                    <button id="register-btn">create</button>
+                    <div id="captcha_img_house" style="text-align:center;margin-bottom:10px">
+                        <img style="width:80%"id="captcha_img" src="captcha/Captcha_image.php">
+                    </div>
+                    <input type="text" placeholder="enter captcha number" id="captcha_key" name="captcha"/>
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
+                        <?php if (isset($_GET["captcha_err"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong captcha</span>
+                            <script th:inline="javascript">
+                                $('#captcha_key').addClass('invalid-blank');
+                            </script>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <button id="register-btn">Create</button>
                     <p class="message">Already registered? <a href="#">Sign In</a></p>
                 </form>
                 <form class="login-form" method="POST" action="/login.php" enctype="multipart/form-data">
@@ -106,8 +118,8 @@ include("resources/static/html/header.html");
                     <input type="text" placeholder="username" name="username" id="login-username-validation" />
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                        <?php if (isset($_GET["uname_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">User Name not found</span>
+                        <?php if (isset($_GET["log_err"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong username or password</span>
                             <script th:inline="javascript">
                                 $('#login-username-validation').addClass('invalid-blank');
                             </script>
@@ -121,8 +133,8 @@ include("resources/static/html/header.html");
                     <?php endif; ?>
                     <input type="password" placeholder="password" name="password" id="login-pass-validation" />
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                        <?php if (isset($_GET["pass_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong password</span>
+                        <?php if (isset($_GET["log_err"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong username or password</span>
                             <script th:inline="javascript">
                                 $('#login-pass-validation').addClass('invalid-blank');
                             </script>
@@ -131,18 +143,6 @@ include("resources/static/html/header.html");
                             <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
                             <script th:inline="javascript">
                                 $('#login-pass-validation').addClass('invalid-blank');
-                            </script>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                    <div id="captcha_img_house" style="text-align:center;margin-bottom:10px">
-                        <img style="width:80%"id="captcha_img" src="captcha/Captcha_image.php">
-                    </div>
-                    <input type="text" placeholder="enter captcha number" id="captcha_key" name="captcha"/>
-                    <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                        <?php if (isset($_GET["captcha_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong captcha</span>
-                            <script th:inline="javascript">
-                                $('#captcha_key').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>

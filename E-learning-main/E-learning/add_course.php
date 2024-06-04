@@ -2,11 +2,14 @@
 require 'database.php';
 include('auth.php');
 include('validation.php');
+include('csrfTokenHandle.php');
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 if (strcmp($user['user_role'], "admin") == 0) {
     if (
         isset($_POST["title"]) && isset($_POST["course_description"])  && isset($_POST["course_detail"]) && isset($_POST["course_slide1"]) && isset($_POST["course_slide2"])
         && isset($_POST["course_slide3"]) && isset($_POST["course_author"]) && isset($_POST["course_link"]) && isset($_POST["course_price"])
-        && isset($_POST["course_view"])
+        && isset($_POST["course_view"]) && isset($_POST["csrfToken"])
     ) {
         $errorMsg = null;
         $error = 0;
@@ -20,53 +23,62 @@ if (strcmp($user['user_role'], "admin") == 0) {
         $course_link = trimAndCheckNull($_POST["course_link"]);
         $course_price = floatval($_POST["course_price"]);
         $course_view = intval($_POST["course_view"]);
-        if (is_null($title)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&tnull_var";
-        }
-        if (is_null($course_description)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&dsnull_var";
-        }
-        if (is_null($course_detail)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&dtnull_var";
-        }
-        if (is_null($course_slide1) || is_null($course_slide2) || is_null($course_slide3)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&snull_var";
-        }
-        if (is_null($course_author)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&anull_var";
-        }
-        if (is_null($course_link)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&lnull_var";
-        } else {
-            if (checkDuplicateLink($conn, $course_link)) {
-                $error = 1;
-                $errorMsg = $errorMsg . "&duplicate";
-            }
-        }
-        if (is_null($course_price)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&pnull_var";
-        }
-        if ($error == 0) {
-            $sql = "INSERT INTO courses(course_id, title, description, detail, slide1, slide2, slide3, author, download_link, price, view) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssssssdi", $title, $course_description, $course_detail, $course_slide1, $course_slide2, $course_slide3, $course_author, $course_link, $course_price, $course_view);
-            if ($stmt->execute()) {
-                header("Location:add_course.php?success");
-                exit;
-            } else {
-                echo $stmt->error;
-            }
-        } else {
+        $clientToken = $_POST["csrfToken"];
+        $admin = $_SESSION["username"];
+        if (checkToken($clientToken, $admin, $redis)) {
 
-            $errorMsg = substr($errorMsg, 1);
-            header("Location:add_course.php?" . $errorMsg);
+            if (is_null($title)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&tnull_var";
+            }
+            if (is_null($course_description)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&dsnull_var";
+            }
+            if (is_null($course_detail)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&dtnull_var";
+            }
+            if (is_null($course_slide1) || is_null($course_slide2) || is_null($course_slide3)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&snull_var";
+            }
+            if (is_null($course_author)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&anull_var";
+            }
+            if (is_null($course_link)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&lnull_var";
+            } else {
+                if (checkDuplicateLink($conn, $course_link)) {
+                    $error = 1;
+                    $errorMsg = $errorMsg . "&duplicate";
+                }
+            }
+            if (is_null($course_price)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&pnull_var";
+            }
+            if ($error == 0) {
+                $sql = "INSERT INTO courses(course_id, title, description, detail, slide1, slide2, slide3, author, download_link, price, view) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssssssssdi", $title, $course_description, $course_detail, $course_slide1, $course_slide2, $course_slide3, $course_author, $course_link, $course_price, $course_view);
+                if ($stmt->execute()) {
+                    header("Location:add_course.php?success");
+                    refreshToken($admin,$redis);
+                    exit;
+                } else {
+                    echo $stmt->error;
+                }
+            } else {
+
+                $errorMsg = substr($errorMsg, 1);
+                header("Location:add_course.php?" . $errorMsg);
+                exit;
+            }
+        } else {
+            header("Location:index.php");
             exit;
         }
     }
@@ -115,8 +127,9 @@ include("resources/static/html/header.html");
     <?php endif; ?>
     <h2 style="padding: 20px 20px 0px 20px; font-weight: 700;">Add Course</h2>
     <form method="post" enctype="multipart/form-data" id="add_cart_form">
+    
         <div class="payment-checkout-container">
-
+        <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
             <div class="cart-detail">
                 <h4>
                     Title

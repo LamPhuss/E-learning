@@ -1,6 +1,8 @@
 <?php
 require 'database.php';
 include('auth.php');
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 
 
 include("resources/static/html/header.html");
@@ -179,7 +181,7 @@ include("resources/static/html/header.html");
                 </div>
                 <form name="paycheck-form" method="post" action="/payment_process.php" id="add_cart_form" onsubmit="return validateForm()">
                     <div class="payment-checkout-container">
-
+                    <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                         <div class="cart-detail">
                             <h4>
                                 Name on card
@@ -233,6 +235,7 @@ include("resources/static/html/header.html");
                             </div>
                             <div class="col-sm-2" style="font-size: 25px; padding-top:10px">
                                 <form name="paycheck-form" method="post" action="/delete_one_item_in_cart.php">
+                                <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                                     <button type="submit" style="background-color: #f2fff4;border-style: none; ">
                                         <i class="fa-solid fa-trash-can" style="color:#f02e0c"></i>
                                         <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($item['course_id']); ?>">

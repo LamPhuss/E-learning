@@ -1,20 +1,22 @@
 <?php
 require 'database.php';
+require 'redis.php';
 session_start();
-if (isset($_SESSION["username"])) {
+if (isset($_SESSION["username"]) && isset($_SESSION["password"])) {
     if (isset($_SESSION['LAST_ACTIVITY'])) {
         $timeout = 86400;
         check_timeout($timeout, $_SESSION['LAST_ACTIVITY']); 
         $username = $_SESSION["username"];
-        $sql = "SELECT * FROM users WHERE username=?";
+        $password = $_SESSION["password"];
+        $sql = "SELECT * FROM users WHERE username=? and password=?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("ss", $username, $password);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
         } else {
-            echo "<h1>404</h1>";
+            die(header("Location: index.php"));
         }
     } else {
         die(header("Location: index.php"));

@@ -1,8 +1,6 @@
 <?php
 require 'database.php';
 include('auth.php');
-include("resources/static/html/header.html");
-
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $duplicate = isset($_GET["duplicate"]) ? true : false;
     $nullVar = isset($_GET["null_var"]) ? true : false;
@@ -24,7 +22,9 @@ if (strcmp($user['user_role'], "admin") != 0) {
     header("Location:error.php");
     exit;
 }
-
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
+include("resources/static/html/header.html");
 ?>
 <html>
 
@@ -97,15 +97,24 @@ if (strcmp($user['user_role'], "admin") != 0) {
                 ?>
                 <tbody>
                     <?php foreach ($user_list as $user) : ?>
+                        <?php
+                        if (isset($user["phone"])) {
+                            $user["phone"] = htmlspecialchars($user["phone"]);
+                        }
+                        if (isset($user["address"])) {
+                            $user["address"] = htmlspecialchars($user["address"]);
+                        }
+                        ?>
                         <tr>
                             <form method="POST" action="/user_manage_update.php" enctype="multipart/form-data">
+                                <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                                 <td><input type="checkbox" name="id" id="<?php echo htmlspecialchars($user['id']); ?>"></td>
                                 <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user['id']); ?>">
                                 <td><input type="text" id="username-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['username']); ?>" class="input-profile-field" name="username" disabled></td>
                                 <td><input type="text" id="email-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['email']); ?>" class="input-profile-field" name="email" disabled></td>
                                 <td><input type="text" id="password-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['password']); ?>" class="input-profile-field" name="password" disabled></td>
-                                <td><input type="text" id="phone-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['phone']); ?>" class="input-profile-field" name="phone" disabled></td>
-                                <td><input type="text" id="address-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo htmlspecialchars($user['address']); ?>" class="input-profile-field" name="address" disabled></td>
+                                <td><input type="text" id="phone-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo $user["phone"]; ?>" class="input-profile-field" name="phone" disabled></td>
+                                <td><input type="text" id="address-input-<?php echo htmlspecialchars($user['id']); ?>" value="<?php echo $user["address"]; ?>" class="input-profile-field" name="address" disabled></td>
                                 <td><button class="btn btn-xs" id='btn-xs' type='submit'> <i class="fa-solid fa-wrench"></i></button></td>
                             </form>
                         </tr>
@@ -118,7 +127,7 @@ if (strcmp($user['user_role'], "admin") != 0) {
         </div>
     </div>
     <div class="footer">
-    <span><a href="logout.php" style="font-size: 20px;">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></a></span><br>
+        <span><a href="logout.php" style="font-size: 20px;">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></a></span><br>
         <span><i class="fa fa-pencil-square-o"></i> Contact</span><a href="#"></a><br>
 
     </div>
@@ -218,10 +227,12 @@ if (strcmp($user['user_role'], "admin") != 0) {
 
             // Tạo đối tượng XHR
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/delete_user.php'); // Thay đổi URL đích cho phù hợp
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.open('POST', '/delete_user.php', true); // Thay đổi URL đích cho phù hợp
             const checkedIdsString = checkedIds.join(',');
-
+            const csrfToken = "<?php echo $csrfToken ?>";
+            var data = new FormData();
+            data.append('checkedIds', checkedIdsString);
+            data.append('csrfToken', csrfToken);
             // Gửi yêu cầu XHR
             xhr.onload = function() {
                 if (xhr.status === 200) {
@@ -233,8 +244,7 @@ if (strcmp($user['user_role'], "admin") != 0) {
                     console.error('Lỗi khi xóa dữ liệu:', xhr.statusText);
                 }
             };
-
-            xhr.send(`checkedIds=${checkedIdsString}`);
+            xhr.send(data);
         }
     </script>
 </body>

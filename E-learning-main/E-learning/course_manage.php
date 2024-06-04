@@ -19,6 +19,8 @@ if (strcmp($user['user_role'], "admin") != 0) {
     header("Location:error.php");
     exit;
 }
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 ?>
 <html>
 
@@ -66,7 +68,7 @@ if (strcmp($user['user_role'], "admin") != 0) {
                 <thead>
                     <tr>
                         <th><input type="checkbox" onclick="checkAll(this)"></th>
-                        <th>Course Title/th>
+                        <th>Course Title </th>
                         <th>Description</th>
                         <th>Detail</th>
                         <th>First image</th>
@@ -97,6 +99,7 @@ if (strcmp($user['user_role'], "admin") != 0) {
                     <?php foreach ($courses_list as $course) : ?>
                         <tr>
                             <form method="POST" action="/course_manage_update.php" enctype="multipart/form-data">
+                                <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                                 <td><input type="checkbox" name="id" id="<?php echo htmlspecialchars($course['course_id']); ?>"></td>
                                 <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
                                 <td><input type="text" id="title-input-<?php echo htmlspecialchars($course['course_id']); ?>" value="<?php echo htmlspecialchars($course['title']); ?>" class="input-profile-field" name="title" disabled></td>
@@ -216,9 +219,11 @@ if (strcmp($user['user_role'], "admin") != 0) {
             // Tạo đối tượng XHR
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/delete_course.php'); // Thay đổi URL đích cho phù hợp
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             const checkedIdsString = checkedIds.join(',');
-
+            const csrfToken = "<?php echo $csrfToken ?>";
+            var data = new FormData();
+            data.append('checkedIds', checkedIdsString);
+            data.append('csrfToken', csrfToken);
             // Gửi yêu cầu XHR
             xhr.onload = function() {
                 if (xhr.status === 200) {
@@ -231,7 +236,7 @@ if (strcmp($user['user_role'], "admin") != 0) {
                 }
             };
 
-            xhr.send(`checkedIds=${checkedIdsString}`);
+            xhr.send(data);
         }
     </script>
 </body>

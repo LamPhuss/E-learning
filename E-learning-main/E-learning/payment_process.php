@@ -1,14 +1,20 @@
 <?php
 require 'database.php';
-
 include('auth.php');
-
+include('csrfTokenHandle.php');
 if (
     !isset($_POST["owner_card"])  || !isset($_POST["card_num"])
-    || !isset($_POST["card_date"]) || !isset($_POST["card_cvc"])
+    || !isset($_POST["card_date"]) || !isset($_POST["card_cvc"]) || !isset($_POST["csrfToken"])
 ) {
     header("Location: start.php");
     exit;
+} else {
+    $clientToken = $_POST["csrfToken"];
+    $admin = $_SESSION["username"];
+    if (!checkToken($clientToken, $admin, $redis)) {
+        header("Location:index.php");
+        exit;
+    }       
 }
 $username = $user["username"];
 include("resources/static/html/header.html");
@@ -47,6 +53,7 @@ include("resources/static/html/header.html");
         </a>
         <?php
         require './vendor/autoload.php';
+
         use PHPMailer\PHPMailer\PHPMailer;
 
         require './vendor/phpmailer/phpmailer/src/Exception.php';
@@ -79,6 +86,7 @@ include("resources/static/html/header.html");
                 $sql = "DELETE FROM cart WHERE username = ? ";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $username);
+                refreshToken($admin,$redis);
                 if ($stmt->execute()) :
             ?>
             <h3 style="padding: 20px 20px 0px 50px;">Thank you for your payment, please check your email to receive course-related materials &lt3 </h3>

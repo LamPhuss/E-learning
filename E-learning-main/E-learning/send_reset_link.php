@@ -14,11 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: forgot_password.php?special_char");
             exit;
         }
-        if (checkUsername($conn, $username)) {
-            if (!$redis->exists($username)) {
+        $user = checkUsername($conn, $username);
+        if (!is_null($user)) {
+            $userId = $user['id'];
+            if (!$redis->exists($userId)) {
                 $key = bin2hex(random_bytes(16));
-                $redis->set($username, $key);
-                $redis->expire($username, $time_period);
+                $redis->set($userId, $key);
+                $redis->expire($userId, $time_period);
             }
             $sql = "SELECT * FROM `users` WHERE username = ? and email = ?";
             $stmt = $conn->prepare($sql);
@@ -52,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Setting the email content
                 $mail->isHTML(true); // Set email format to plain text
                 $mail->Subject = 'Reset password link';
-                $mail->Body = "<p>Here is your link to reset passwort: <a href='http://localhost:8001/handle_forgot_password.php?p=" . $username . "&&v=" . $redis->get($username) . "'>link to reset password</a></p><p>If you have any problems, please contact us via email: elearninghust@gmail.com</p>";
+                $mail->Body = "<p>Here is your link to reset passwort: <a href='http://localhost:8001/handle_forgot_password.php?p=" . $userId . "&&v=" . $redis->get($userId) . "'>link to reset password</a></p><p>If you have any problems, please contact us via email: elearninghust@gmail.com</p>";
                 $mail->send();
                 header("Location:forgot_password.php?send_success");
                 exit;
@@ -76,10 +78,12 @@ function checkUsername($conn, $username)
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
+    
     if ($result->num_rows > 0) {
-        return true;
+        $user = $result->fetch_assoc();
+        return $user;
     } else {
-        return false;
+        return null;
     }
 }
 function validation($username)

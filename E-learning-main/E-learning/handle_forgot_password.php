@@ -13,18 +13,18 @@ include("resources/static/html/header.html");
         <div class="login-page">
                 <?php if (isset($_GET["p"]) && isset($_GET["v"])) : ?>
                     <?php
-                    $username = $_GET["p"];
+                    $userId = $_GET["p"];
                     $key = $_GET["v"];
-                    if ($redis->get($username)):
+                    if ($redis->get($userId)):
                     ?>
                     <?php
-                    $checkKey = $redis->get($username);
+                    $checkKey = $redis->get($userId);
                     if (strcmp($key, $checkKey) == 0) :
                     ?>
                         <div class="index-form">
                             <form class="login-form" method="POST" action="/update_password.php" enctype="multipart/form-data">
                                 <h2 style="color: #636363;">Create new password</h2>
-                                <input type="hidden" name="username" value="<?php echo htmlspecialchars($username) ?>" />
+                                <input type="hidden" name="userId" value="<?php echo htmlspecialchars($userId) ?>" />
                                 <input type="password" placeholder="new password" name="password" id="regis-pass-validation" />
                                 <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                                     <?php if (isset($_GET["special_char"])) : ?>

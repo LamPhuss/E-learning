@@ -1,10 +1,10 @@
 <?php
 require 'database.php';
 include('auth.php');
-
+include('csrfTokenHandle.php');
 if (
     isset($_POST["course_id"])  && isset($_POST["course_title"])
-    && isset($_POST["course_img"]) && isset($_POST["course_author"]) && isset($_POST["course_price"])
+    && isset($_POST["course_img"]) && isset($_POST["course_author"]) && isset($_POST["course_price"]) && isset($_POST["csrfToken"])
 ) {
     $username = $user["username"];
     $course_id = intval($_POST["course_id"]);
@@ -12,24 +12,31 @@ if (
     $course_img = $_POST["course_img"];
     $course_author = $_POST["course_author"];
     $course_price = floatval($_POST["course_price"]);
-
-    if (checkValidCourse($conn, $course_id, $course_title, $course_img, $course_author, $course_price)) {
-        if (checkExistedCoursed($conn, $course_id, $username)) {
-            header("Location: learning.php?course_id=" . $course_id. "&not_added");
-            exit;
-        } else {
-            $sql = "INSERT INTO cart(cart_id, course_id, course_title, course_img, course_author, course_price, username) VALUES (NULL, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("isssds", $course_id, $course_title, $course_img, $course_author, $course_price, $username);
-            if ($stmt->execute()) {
-                header("Location: learning.php?course_id=" . $course_id);
+    $clientToken = $_POST["csrfToken"];
+    $userToken = $_SESSION["username"];
+    if (checkToken($clientToken, $userToken, $redis)) {
+        if (checkValidCourse($conn, $course_id, $course_title, $course_img, $course_author, $course_price)) {
+            if (checkExistedCoursed($conn, $course_id, $username)) {
+                header("Location: learning.php?course_id=" . $course_id . "&not_added");
                 exit;
             } else {
-                echo "<h1>Error 404</h1>";
+                $sql = "INSERT INTO cart(cart_id, course_id, course_title, course_img, course_author, course_price, username) VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("isssds", $course_id, $course_title, $course_img, $course_author, $course_price, $username);
+                if ($stmt->execute()) {
+                    header("Location: learning.php?course_id=" . $course_id);
+                    refreshToken($userToken, $redis);
+                    exit;
+                } else {
+                    echo "<h1>Error 404</h1>";
+                }
             }
+        } else {
+            echo "<h1>ERROR :UNKNOWN course </h1>";
         }
     } else {
-        echo "<h1>ERROR :UNKNOWN course </h1>";
+        header("Location:index.php");
+        exit;
     }
 }
 function checkValidCourse($conn, $course_id, $course_title, $course_img, $course_author, $course_price)

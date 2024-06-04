@@ -1,6 +1,7 @@
 <?php
 require 'database.php';
 include('auth.php');
+include('csrfTokenHandle.php');
 $username = $user["username"];
 $sql = "SELECT * FROM users WHERE username=?";
 $stmt = $conn->prepare($sql);
@@ -9,6 +10,12 @@ $stmt->execute();
 $result = $stmt->get_result();
 if ($result->num_rows == 1) {
     $user_detail = $result->fetch_assoc();
+    if (isset($user_detail["phone"])) {
+        $phone = htmlspecialchars($user_detail["phone"]);
+    }
+    if (isset($user_detail["address"])) {
+        $address = htmlspecialchars($user_detail["address"]);
+    }
 } else {
     echo "<h1>404</h1>";
 }
@@ -25,27 +32,34 @@ if (!empty($matchingFiles)) {
     $avatar = end($tmp2);
 }
 
-if (isset($_FILES["file"])) {
-    try {
-        if (!is_null($avatar)) {
-            unlink("/var/www/html/upload/" . $avatar);
+if (isset($_FILES["file"]) && isset($_POST["csrfToken"])) {
+    $clientToken = $_POST["csrfToken"];
+    if (checkToken($clientToken, $username, $redis)) {
+        try {
+            if (!is_null($avatar)) {
+                unlink("/var/www/html/upload/" . $avatar);
+            }
+            $file_name = $_FILES["file"]["name"];
+            if (preg_match('/^.+\.ph(p|ps|ar|tml)/', $file_name)) {
+                header("Location: user_profile.php?img_err");
+                exit;
+            }
+            if (!preg_match('/^.*\.(jpg|jpeg|png|gif)$/', $file_name)) {
+                header("Location: user_profile.php?img_err");
+                exit;
+            }
+            $tmp = explode(".", $file_name);
+            $extension = end($tmp);
+            $avatar = $username . "." . $extension;
+            $newFile = $dir . "/" . $avatar;
+            move_uploaded_file($_FILES["file"]["tmp_name"], $newFile);
+            refreshToken($username,$redis);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
         }
-        $file_name = $_FILES["file"]["name"];
-        if (preg_match('/^.+\.ph(p|ps|ar|tml)/', $file_name)) {
-            header("Location: user_profile.php?img_err");
-            exit;
-        }
-        if (!preg_match('/^.*\.(jpg|jpeg|png|gif)$/', $file_name)) {
-            header("Location: user_profile.php?img_err");
-            exit;
-        }
-        $tmp = explode(".", $file_name);
-        $extension = end($tmp);
-        $avatar = $username . "." . $extension;
-        $newFile = $dir . "/" . $avatar;
-        move_uploaded_file($_FILES["file"]["tmp_name"], $newFile);
-    } catch (Exception $e) {
-        $error = $e->getMessage();
+    } else {
+        header("Location:index.php");
+        exit;
     }
 }
 if (is_null($avatar)) {
@@ -57,7 +71,8 @@ $checkWrongFile = 0;
 if ($wrongFile) {
     $checkWrongFile = 1;
 }
-
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 include("resources/static/html/header.html");
 
 ?>
@@ -148,7 +163,7 @@ include("resources/static/html/header.html");
     </div>
     <div class="container">
         <div class="overlay" id="overlay">
-            <div class="overlay-panel" id="overlay-panel" style="width: 500px;margin-left:870px">
+            <div class="overlay-panel" id="overlay-panel" style="width: 500px;margin-left:38%">
                 <iframe name="headerframe" width="100%" height="550px" frameborder="0" src="user_profile_edit_password.php"></iframe>
             </div>
         </div>
@@ -170,6 +185,7 @@ include("resources/static/html/header.html");
                                 <form method="post" enctype="multipart/form-data">
                                     <div class="ht-tm-element custom-file">
                                         <input type="file" class="custom-file-input" name="file" id="fileInput">
+                                        <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                                         <label class="custom-file-label">Change avatar</label>
                                     </div>
                                     <?php
@@ -199,6 +215,7 @@ include("resources/static/html/header.html");
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <?php echo htmlspecialchars($user_detail["username"]) ?>
+                                    <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
                                 </div>
                             </div>
                             <hr>
@@ -226,7 +243,7 @@ include("resources/static/html/header.html");
                                     <h6 class="mb-0">Phone</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php if(isset($user_detail["phone"])) :?><?php echo htmlspecialchars($user_detail["phone"]) ?><?php endif ?>" class="input-profile-field" name="phone_num">
+                                    <input type="text" value="<?php echo $phone ?>" class="input-profile-field" name="phone_num">
                                 </div>
                             </div>
                             <hr>
@@ -235,7 +252,7 @@ include("resources/static/html/header.html");
                                     <h6 class="mb-0">Address</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php if (isset($user_detail["address"])) : ?><?php echo htmlspecialchars($user_detail["address"]) ?><?php endif ?>" class="input-profile-field" name="address">
+                                    <input type="text" value="<?php echo $address ?>" class="input-profile-field" name="address">
                                 </div>
                             </div>
                             <hr>
@@ -247,44 +264,6 @@ include("resources/static/html/header.html");
                         </div>
                     </div>
                 </form>
-                <!--                           
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <h6 class="mb-0">Recent subjects</h6>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="text-secondary"><a href="#">
-                                    Introduction to HTML
-                                </a>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="text-secondary"><a href="#">
-                                    Introduction to CSS
-                                </a>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="text-secondary"><a href="#">
-                                    Introduction to Javascript
-                                </a>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="text-secondary"><a href="#">
-                                    Introduction to PHP
-                                </a>
-                            </div>
-                        </div>
-                        <hr>
-
-                    </div>
-                </div>-->
             </div>
 
         </div>

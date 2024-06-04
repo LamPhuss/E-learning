@@ -2,9 +2,10 @@
 require 'database.php';
 include('auth.php');
 include('validation.php');
+include('csrfTokenHandle.php');
 if (strcmp($user['user_role'], "admin") == 0) {
     if (
-        isset($_POST["username"]) && isset($_POST["email"])  && isset($_POST["password"]) && isset($_POST["phone"]) && isset($_POST["address"])
+        isset($_POST["username"]) && isset($_POST["email"])  && isset($_POST["password"]) && isset($_POST["phone"]) && isset($_POST["address"]) && isset($_POST["csrfToken"])
     ) {
         $errorMsg = null;
         $error = 0;
@@ -13,47 +14,55 @@ if (strcmp($user['user_role'], "admin") == 0) {
         $password = trimAndCheckNull($_POST["password"]);
         $phone = trimAndCheckNull($_POST["phone"]);
         $address = trimAndCheckNull($_POST["address"]);
-        if (is_null($username)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&unull_var";
-        } else {
-            if (!validation($username, $password)) {
+        $clientToken = $_POST["csrfToken"];
+        $admin = $_SESSION["username"];
+        if (checkToken($clientToken, $admin, $redis)) {
+            if (is_null($username)) {
                 $error = 1;
-                $errorMsg = $errorMsg . "&special_char";
+                $errorMsg = $errorMsg . "&unull_var";
             } else {
-                if (checkDuplicateUsername($conn, $username)) {
+                if (!validation($username, $password)) {
                     $error = 1;
-                    $errorMsg = $errorMsg . "&duplicate";
+                    $errorMsg = $errorMsg . "&special_char";
+                } else {
+                    if (checkDuplicateUsername($conn, $username)) {
+                        $error = 1;
+                        $errorMsg = $errorMsg . "&duplicate";
+                    }
                 }
             }
-        }
-        if (is_null($email)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&mnull_var";
-        }
-        if (is_null($password)) {
-            $error = 1;
-            $errorMsg = $errorMsg . "&pnull_var";
-        } else {
-            if (!validation($username, $password)) {
+            if (is_null($email)) {
                 $error = 1;
-                $errorMsg = $errorMsg . "&special_char";
+                $errorMsg = $errorMsg . "&mnull_var";
             }
-        }
-        if ($error == 0) {
-            $enc_password = md5($password);
-            $sql = "INSERT INTO users(id,username, password, email, phone, address) VALUES (NULL, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssss", $username, $enc_password, $email, $phone, $address);
-            if ($stmt->execute()) {
-                header("Location:add_user.php?success");
-                exit;
+            if (is_null($password)) {
+                $error = 1;
+                $errorMsg = $errorMsg . "&pnull_var";
             } else {
-                echo $stmt->error;
+                if (!validation($username, $password)) {
+                    $error = 1;
+                    $errorMsg = $errorMsg . "&special_char";
+                }
+            }
+            if ($error == 0) {
+                $enc_password = md5($password);
+                $sql = "INSERT INTO users(id,username, password, email, phone, address) VALUES (NULL, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssss", $username, $enc_password, $email, $phone, $address);
+                if ($stmt->execute()) {
+                    header("Location:add_user.php?success");
+                    refreshToken($admin,$redis);
+                    exit;
+                } else {
+                    echo $stmt->error;
+                }
+            } else {
+                $errorMsg = substr($errorMsg, 1);
+                header("Location:add_user.php?" . $errorMsg);
+                exit;
             }
         } else {
-            $errorMsg = substr($errorMsg, 1);
-            header("Location:add_user.php?" . $errorMsg);
+            header("Location:index.php");
             exit;
         }
     }
@@ -81,7 +90,8 @@ function trimAndCheckNull($string)
         return $trimmedString;
     }
 }
-
+$tokens = $redis->hGetAll($username);
+$csrfToken = $tokens['csrfToken'];
 
 include("resources/static/html/header.html");
 
@@ -100,7 +110,7 @@ include("resources/static/html/header.html");
     <h2 style="padding: 20px 20px 0px 20px; font-weight: 700;">Add User</h2>
     <form method="post" enctype="multipart/form-data" id="add_cart_form" onsubmit="return validateForm()">
         <div class="payment-checkout-container">
-
+            <input type="hidden" value="<?php echo htmlspecialchars($csrfToken) ?>" name="csrfToken">
             <div class="cart-detail">
                 <h4>
                     User Name
