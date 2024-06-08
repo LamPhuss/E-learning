@@ -18,7 +18,7 @@ $avatar = null;
 if (!file_exists($dir)) {
     mkdir($dir);
 }
-$matchingFiles = glob($dir . '/test*');
+$matchingFiles = glob($dir . '/' . $username . '*');
 if (!empty($matchingFiles)){
 
     $tmp2 = explode("/", $matchingFiles[0]);
