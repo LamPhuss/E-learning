@@ -9,11 +9,17 @@ if (isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["emai
     $enc_password = md5($confirm_password);
     $email = $_POST["email"];
     $verify_captcha = json_decode(verifyCaptcha($_POST['captcha']), true);
-    if (!validation($username, $confirm_password)) {
+    if (!validation($username)) {
         $error_message = "rspecial_char";
         header("Location: index.php?" . $error_message);
         exit;
     }
+    if (!validPass($confirm_password)) {
+        $error_message = 'unsafe_password';
+        header("Location: index.php?" . $error_message);
+        exit;
+    }
+
     if ($verify_captcha['captcha_status'] == 200) {
         if (checkValid($conn, $username)) {
             $password = trimAndCheckNull($password);

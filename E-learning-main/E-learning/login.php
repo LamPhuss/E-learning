@@ -7,13 +7,11 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $enc_password = md5($password);
-    if (!validation($username, $password)) {
+    if (!validation($username)) {
         $error_message = "lspecial_char";
         header("Location: index.php?" . $error_message);
         exit;
     };
-
-
 
     if (checkUsername($conn, $username)) {
         $sql = "SELECT username,password FROM users WHERE username =? AND password =?";

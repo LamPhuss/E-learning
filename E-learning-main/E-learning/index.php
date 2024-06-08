@@ -1,6 +1,10 @@
 <?php
 require_once 'captcha/Captcha_verify.php';
 include("resources/static/html/header.html");
+
+function sanitize($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <html>
@@ -15,19 +19,19 @@ include("resources/static/html/header.html");
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["duplicate"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">User Name already existed</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("User Name already existed"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-username-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["rspecial_char"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("This field not valid"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-username-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["null"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Don't leave it blank!"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-username-validation').addClass('invalid-blank');
                             </script>
@@ -35,20 +39,26 @@ include("resources/static/html/header.html");
                     <?php endif; ?>
                     <input type="password" placeholder="password" name="password" id="regis-pass-validation" />
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
+                        <?php if (isset($_GET["unsafe_password"])) : ?>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Password needs at least 1 upper case, 1 special character and 1 number"); ?></span>
+                            <script th:inline="javascript">
+                                $('#regis-pass-validation').addClass('invalid-blank');
+                            </script>
+                        <?php endif; ?>
                         <?php if (isset($_GET["rspecial_char"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("This field cannot contain special character"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["null"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Don't leave it blank!"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["too_small"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Password must contain at least 8 characters</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Password must contain at least 8 characters"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
@@ -57,19 +67,19 @@ include("resources/static/html/header.html");
                     <input type="password" placeholder="confirm password" name="confirm_password" id="re-pass-validation" />
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["rspecial_char"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("This field not valid"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["null"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Don't leave it blank!"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["not_match"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Confirm password must match above password</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Confirm password must match above password"); ?></span>
                             <script th:inline="javascript">
                                 $('#re-pass-validation').addClass('invalid-blank');
                             </script>
@@ -78,7 +88,7 @@ include("resources/static/html/header.html");
                     <input type="email" placeholder="email" id="regis-email-validation" name="email" />
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["null"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Don't leave it blank!"); ?></span>
                             <script th:inline="javascript">
                                 $('#regis-email-validation').addClass('invalid-blank');
                             </script>
@@ -90,25 +100,25 @@ include("resources/static/html/header.html");
                     <input type="text" placeholder="enter captcha number" id="captcha_key" name="captcha"/>
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["captcha_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong captcha</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Wrong captcha"); ?></span>
                             <script th:inline="javascript">
                                 $('#captcha_key').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                     <?php endif; ?>
                     <button id="register-btn">Create</button>
-                    <p class="message">Already registered? <a href="#">Sign In</a></p>
+                    <p class="message">Already registered? <a href="/index.php">Sign In</a></p>
                 </form>
                 <form class="login-form" method="POST" action="/login.php" enctype="multipart/form-data">
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["success"])) : ?>
-                            <h4 style="color:blue">Register success, please login here</h4>
+                            <h4 style="color:blue"><?php echo sanitize("Register success, please login here"); ?></h4>
                             <script th:inline="javascript">
                                 $('#pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["update_pass"])) : ?>
-                            <h4 style="color:blue">Update new password success, please login here</h4>
+                            <h4 style="color:blue"><?php echo sanitize("Update new password success, please login here"); ?></h4>
                             <script th:inline="javascript">
                                 $('#pass-validation').addClass('invalid-blank');
                             </script>
@@ -119,13 +129,13 @@ include("resources/static/html/header.html");
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["log_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong username or password</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Wrong username or password"); ?></span>
                             <script th:inline="javascript">
                                 $('#login-username-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["lspecial_char"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("This field cannot contain special character"); ?></span>
                             <script th:inline="javascript">
                                 $('#login-username-validation').addClass('invalid-blank');
                             </script>
@@ -134,13 +144,13 @@ include("resources/static/html/header.html");
                     <input type="password" placeholder="password" name="password" id="login-pass-validation" />
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["log_err"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">Wrong username or password</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("Wrong username or password"); ?></span>
                             <script th:inline="javascript">
                                 $('#login-pass-validation').addClass('invalid-blank');
                             </script>
                         <?php endif; ?>
                         <?php if (isset($_GET["lspecial_char"])) : ?>
-                            <span class="blank-message" id="error" style="margin-top: -10px;">This field can not contain special character</span>
+                            <span class="blank-message" id="error" style="margin-top: -10px;"><?php echo sanitize("This field cannot contain special character"); ?></span>
                             <script th:inline="javascript">
                                 $('#login-pass-validation').addClass('invalid-blank');
                             </script>
@@ -151,7 +161,7 @@ include("resources/static/html/header.html");
                     <p class="message2"><a href="forgot_password.php" style="color: #0d6efd;">Forgot password? </a></p>
                 </form>
                 <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                    <?php if (isset($_GET["duplicate"]) || isset($_GET["rspecial_char"]) || isset($_GET["null"]) || isset($_GET["not_match"])) : ?>
+                    <?php if (isset($_GET["duplicate"]) || isset($_GET["rspecial_char"]) || isset($_GET["null"]) || isset($_GET["captcha_err"]) || isset($_GET["rspecial_char"]) || isset($_GET["unsafe_password"]) ) : ?>
                         <script th:inline="javascript">
                             $('form').animate({
                                 height: "toggle",
@@ -274,23 +284,11 @@ include("resources/static/html/header.html");
             $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Password must contain at least 8 characters</span>');
             $('#regis-pass-validation').addClass('invalid-blank');
             event.preventDefault();
-        } else {
-            if (checkSpecialChar($('#regis-pass-validation').val())) {
-                $('#regis-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">This field must not contain special character!</span>');
-                $('#regis-pass-validation').addClass('invalid-blank');
-                event.preventDefault();
-            }
         }
         if ($('#re-pass-validation').val().length === 0) {
             $('#re-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
             $('#re-pass-validation').addClass('invalid-blank');
             event.preventDefault();
-        } else {
-            if (checkSpecialChar($('#re-pass-validation').val())) {
-                $('#re-pass-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">This field must not contain special character!</span>');
-                $('#re-pass-validation').addClass('invalid-blank');
-                event.preventDefault();
-            }
         }
         if ($('#regis-username-validation').val().length === 0) {
             $('#regis-username-validation').after('<span class="blank-message" id="error" style="margin-top: -10px;">Dont leave it blank!</span>');
