@@ -24,12 +24,29 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
+            $lifetime=86400;
+            $maxlifetime = time() + $lifetime;
+            $path = '/';
+            $domain = '.ngrok-free.app';
+            $samesite = 'lax';
+            session_set_cookie_params(array(
+                'lifetime' => $maxlifetime,
+                'path' => $path,
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => $samesite
+            ));
             session_start();
             $_SESSION["username"] = $username;
             $_SESSION["password"] = $enc_password;
             $_SESSION['LAST_ACTIVITY'] = time();
             $token = bin2hex(random_bytes(16));
             $redis->hSet($username, "csrfToken", $token);
+            $sessionid = bin2hex(random_bytes(32));
+            $_SESSION['session_id'] = $sessionid;
+            $redis->hSet($username, "sessionid", $sessionid);
+            $redis->hSet($username, "cookie", $_COOKIE['PHPSESSID']);
             header("Location: start.php");
             exit;
         } else {
@@ -56,3 +73,4 @@ function checkUsername($conn, $username)
         return false;
     }
 }
+
