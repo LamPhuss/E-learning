@@ -77,7 +77,7 @@ include("resources/static/html/header.html");
                     <?php endforeach; ?>
                     <li>
                         <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
-                        <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
+                        <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Purchase</button>
                     </li>
                 </ul>
             </div>
@@ -253,10 +253,10 @@ include("resources/static/html/header.html");
                 <div class="payment-checkout">
                     <h4>Total</h4>
                     <h1 style="font-weight: 700;font-size: 35px">$<?php echo htmlspecialchars($total); ?></h1>
-                    <button type="button" class="pucharse-button" onclick="toggleMenu()">Pucharse</button>
+                    <button type="button" class="pucharse-button" onclick="toggleMenu()">Purchase</button>
                 </div>
             <?php else : ?>
-                <h3> You haven't pucharse anything </h3>
+                <h3> You haven't purchase anything </h3>
             <?php endif; ?>
         </div>
     </div>

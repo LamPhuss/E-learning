@@ -102,7 +102,7 @@ if ($notAdded) {
                     <?php endforeach; ?>
                     <li>
                         <h2 style="font-weight: 700; font-size: 25px">Total: <?php echo htmlspecialchars($total); ?></h2>
-                        <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Pucharse</button>
+                        <button type="button" class="cart-pucharse-button" onclick="location.href='/paycheck.php';">Purchase</button>
                     </li>
                 </ul>
 
