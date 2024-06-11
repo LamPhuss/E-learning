@@ -3,6 +3,10 @@ require 'database.php';
 include('auth.php');
 include 'validation.php';
 include('csrfTokenHandle.php');
+if (strcmp($user['user_role'], "admin") != 0) {
+    header("Location:error.php");
+    exit;
+}
 if (
     isset($_POST["user_id"]) && isset($_POST["username"]) && isset($_POST["email"])  && isset($_POST["password"]) && isset($_POST["phone"]) && isset($_POST["address"]) && isset($_POST["csrfToken"])
 ) {
@@ -16,17 +20,23 @@ if (
     $phone = trimAndCheckNull($_POST["phone"]);
     $address = trimAndCheckNull($_POST["address"]);
     $clientToken = $_POST["csrfToken"];
+    if (isset($phone)) {
+        if (!phoneValidation($phone)) {
+            header("Location:user_manage.php?phoneNum_err");
+            exit;
+        }
+    }
     if (checkToken($clientToken, $admin, $redis)) {
         if (!is_null($username) && !is_null($email) && !is_null($password)) {
             if (checkDuplicateUsername($conn, $username, $user_id)) {
-                if (validation($username, $password)) {
+                if (validation($username, $username)) {
                     $sql = "UPDATE users SET username = ?, email = ?, password = ?, phone = ?, address = ? WHERE id = ?";
                     $stmt = $conn->prepare($sql);
-                    $password_enc = md5($password);
+                    $password_enc = password_hash($password, PASSWORD_BCRYPT);
                     $stmt->bind_param("sssssi", $username, $email, $password_enc, $phone, $address, $user_id);
                     if ($stmt->execute()) {
                         $error = 0;
-                        refreshToken($admin,$redis);
+                        refreshToken($admin, $redis);
                         header("Location: user_manage.php");
                         exit;
                     } else {
@@ -79,5 +89,14 @@ function trimAndCheckNull($string)
     } else {
 
         return $trimmedString;
+    }
+}
+function phoneValidation($phone)
+{
+    $check = '/^[0-9]+$/';
+    if (preg_match($check, $phone)) {
+        return true;
+    } else {
+        return false;
     }
 }

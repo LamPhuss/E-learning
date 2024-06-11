@@ -17,7 +17,7 @@ session_set_cookie_params(array(
     'samesite' => $samesite
 ));
 session_start();
-if (isset($_SESSION["username"]) && isset($_SESSION["password"]) && isset($_SESSION['session_id'])) {
+if (isset($_SESSION["username"]) && isset($_SESSION['session_id'])) {
     if (isset($_SESSION['LAST_ACTIVITY'])) {
         $timeout = 86400;
         check_timeout($timeout, $_SESSION['LAST_ACTIVITY']);
@@ -25,10 +25,9 @@ if (isset($_SESSION["username"]) && isset($_SESSION["password"]) && isset($_SESS
         $username = $_SESSION["username"];
         $cookie = $_COOKIE['PHPSESSID'];
         if (checkSession($redis, $sessionid, $cookie, $username)) {
-            $password = $_SESSION["password"];
-            $sql = "SELECT * FROM users WHERE username=? and password=?";
+            $sql = "SELECT * FROM users WHERE username=? ";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $username, $password);
+            $stmt->bind_param("s", $username);
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result->num_rows == 1) {

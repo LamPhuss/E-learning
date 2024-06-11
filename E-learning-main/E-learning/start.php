@@ -110,7 +110,7 @@ include("resources/static/html/header.html");
             </ul>
             <h2 class="_style_top"><a href="#">Most viewed</a></h2>
             <?php
-            $sql = "SELECT * FROM courses ORDER BY view asc";
+            $sql = "SELECT * FROM courses ORDER BY view desc";
             $result = $conn->query($sql);
             $courses_view = array();
 

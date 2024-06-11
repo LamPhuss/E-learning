@@ -1,10 +1,6 @@
 <?php
 require_once 'captcha/Captcha_verify.php';
 include("resources/static/html/header.html");
-
-function sanitize($data) {
-    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-}
 ?>
 
 <html>
@@ -15,7 +11,7 @@ function sanitize($data) {
             <div class="index-form">
                 <form class="register-form" method="POST" action="/register.php" enctype="multipart/form-data">
                     <h2 style="color: #636363;">Sign up</h2>
-                    <input type="text" placeholder="username" name="username" id="regis-username-validation" value="<?php echo sanitize($_POST['username'] ?? ''); ?>" />
+                    <input type="text" placeholder="username" name="username" id="regis-username-validation" />
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["duplicate"])) : ?>
@@ -91,7 +87,7 @@ function sanitize($data) {
                     <div id="captcha_img_house" style="text-align:center;margin-bottom:10px">
                         <img style="width:80%"id="captcha_img" src="captcha/Captcha_image.php">
                     </div>
-                    <input type="text" placeholder="enter captcha number" id="captcha_key" name="captcha" value="<?php echo sanitize($_POST['captcha'] ?? ''); ?>" />
+                    <input type="text" placeholder="enter captcha number" id="captcha_key" name="captcha"/>
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["captcha_err"])) : ?>
                             <span class="blank-message" id="error" style="margin-top: -10px;">Wrong captcha</span>
@@ -119,7 +115,7 @@ function sanitize($data) {
                         <?php endif; ?>
                     <?php endif; ?>
                     <h2 style="color: #636363;">Sign in</h2>
-                    <input type="text" placeholder="username" name="username" id="login-username-validation" value="<?php echo sanitize($_POST['username'] ?? ''); ?>" />
+                    <input type="text" placeholder="username" name="username" id="login-username-validation" />
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["log_err"])) : ?>
@@ -155,7 +151,7 @@ function sanitize($data) {
                     <p class="message2"><a href="forgot_password.php" style="color: #0d6efd;">Forgot password? </a></p>
                 </form>
                 <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
-                    <?php if (isset($_GET["duplicate"]) || isset($_GET["rspecial_char"]) || isset($_GET["null"]) || isset($_GET["not_match"])) : ?>
+                    <?php if (isset($_GET["duplicate"]) || isset($_GET["rspecial_char"]) || isset($_GET["null"]) || isset($_GET["not_match"]) || isset($_GET["captcha_err"])) : ?>
                         <script th:inline="javascript">
                             $('form').animate({
                                 height: "toggle",

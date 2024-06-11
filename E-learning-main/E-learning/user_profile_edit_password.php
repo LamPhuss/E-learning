@@ -14,7 +14,7 @@ if (
             $sql = "UPDATE users SET password = ? WHERE username = ?";
             $stmt = $conn->prepare($sql);
             if (validation($new_password)) {
-                $new_password_enc = md5($new_password);
+                $new_password_enc = password_hash($new_password, PASSWORD_BCRYPT);
                 $stmt->bind_param("ss", $new_password_enc, $username);
                 if ($stmt->execute()) {
                     echo "<body style='background-color:#f2fff4'><h2>Update success, please reload the page and login again</h2></body>";
@@ -40,14 +40,20 @@ if (
 
 function checkOldPass($conn, $username, $old_password)
 {
-    $sql = "SELECT * FROM `users` WHERE username=? AND password=?";
+    $sql = "SELECT * FROM `users` WHERE username=?";
     $stmt = $conn->prepare($sql);
-    $old_password_enc = md5($old_password);
-    $stmt->bind_param("ss", $username, $old_password_enc);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        if(password_verify($old_password,$user['password'])){
+            return true;
+        }
+        else{
+            return false;
+        }
         return true;
     } else {
         return false;

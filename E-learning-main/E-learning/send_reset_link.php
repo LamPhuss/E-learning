@@ -5,7 +5,7 @@ require './vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
-$time_period = 1000;
+$time_period = 900;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["username"]) && isset($_POST["email"])) {
         $username = $_POST["username"];
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Setting the email content
                 $mail->isHTML(true); // Set email format to plain text
                 $mail->Subject = 'Reset password link';
-                $mail->Body = "<p>Here is your link to reset passwort: <a href='http://localhost:8001/handle_forgot_password.php?p=" . $userId . "&&v=" . $redis->get($userId) . "'>link to reset password</a></p><p>If you have any problems, please contact us via email: elearninghust@gmail.com</p>";
+                $mail->Body = "<p>Here is your link to reset passwort: <a href='http://localhost:80/handle_forgot_password.php?p=" . $userId . "&&v=" . $redis->get($userId) . "'>link to reset password</a></p><p>If you have any problems, please contact us via email: elearninghust@gmail.com</p>";
                 $mail->send();
                 header("Location:forgot_password.php?send_success");
                 exit;

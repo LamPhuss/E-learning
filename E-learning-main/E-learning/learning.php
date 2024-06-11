@@ -12,6 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $result = $stmt->get_result();
         if ($result->num_rows == 1) {
             $course = $result->fetch_assoc();
+            $currview = $course['view'] + 1;
+            UpdateView($conn,$currview,$course_id);
         } else {
             echo "<h1>404</h1>";
         }
@@ -20,6 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         exit;
     }
     $notAdded = isset($_GET["not_added"]) ? true : false;
+}
+function UpdateView($conn,$view,$course_id){
+    $sql = "UPDATE courses SET view = ? WHERE course_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii",$view, $course_id);
+    $stmt->execute();
 }
 $tokens = $redis->hGetAll($username);
 $csrfToken = $tokens['csrfToken'];
@@ -123,7 +131,7 @@ if ($notAdded) {
     </div>
     <div class="container" style="margin:0 , padding 0">
         <div id="learning-panel">
-            <h1 class="learning-header">HTML Tutorial</h1>
+            <h1 class="learning-header"><?php echo htmlspecialchars($course['title']); ?></h1>
             <div class="image-container">
                 <div class="slide">
                     <div class="slideNumber">1</div>

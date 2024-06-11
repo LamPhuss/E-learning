@@ -45,7 +45,7 @@ if (strcmp($user['user_role'], "admin") == 0) {
                 }
             }
             if ($error == 0) {
-                $enc_password = md5($password);
+                $enc_password = password_hash($password, PASSWORD_BCRYPT);
                 $sql = "INSERT INTO users(id,username, password, email, phone, address) VALUES (NULL, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sssss", $username, $enc_password, $email, $phone, $address);

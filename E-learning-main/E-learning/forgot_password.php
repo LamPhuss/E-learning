@@ -11,7 +11,7 @@ include("resources/static/html/header.html");
                 <form class="login-form" method="POST" action="/send_reset_link.php" enctype="multipart/form-data">
                     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") : ?>
                         <?php if (isset($_GET["send_success"])) : ?>
-                            <h3 style="color:blue">Please check your email to get link to recover your password</h3>
+                            <h3 style="color:blue">Please check your email to get link to recover your password(link available in 5 minutes)</h3>
                             <script th:inline="javascript">
                                 $('#pass-validation').addClass('invalid-blank');
                             </script>

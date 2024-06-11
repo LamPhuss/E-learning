@@ -6,7 +6,7 @@ if (isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["emai
     $username = $_POST["username"];
     $password = $_POST["password"];
     $confirm_password = $_POST["confirm_password"];
-    $enc_password = md5($confirm_password);
+    $enc_password = password_hash($confirm_password, PASSWORD_BCRYPT);
     $email = $_POST["email"];
     $verify_captcha = json_decode(verifyCaptcha($_POST['captcha']), true);
     if (!validation($username, $confirm_password)) {

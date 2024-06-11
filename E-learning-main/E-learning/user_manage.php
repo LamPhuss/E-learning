@@ -5,6 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $duplicate = isset($_GET["duplicate"]) ? true : false;
     $nullVar = isset($_GET["null_var"]) ? true : false;
     $specialChar = isset($_GET["special_char"]) ? true : false;
+    $phoneErr = isset($_GET["phoneNum_err"]) ? true : false;
     $checkDuplicate = 0;
     if ($duplicate) {
         $checkDuplicate = 1;
@@ -16,6 +17,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $checkSpecialChar = 0;
     if ($specialChar) {
         $checkSpecialChar = 1;
+    }
+    $checkPhone = 0;
+    if ($phoneErr) {
+        $checkPhone = 1;
     }
 }
 if (strcmp($user['user_role'], "admin") != 0) {
@@ -187,7 +192,8 @@ include("resources/static/html/header.html");
         const checkDup = <?php echo htmlspecialchars($checkDuplicate); ?>;
         const checkNull = <?php echo htmlspecialchars($checkNull); ?>;
         const checkSpecialChar = <?php echo htmlspecialchars($checkSpecialChar); ?>;
-        if (checkDup > 0 || checkNull > 0 || checkSpecialChar > 0) {
+        const checkPhone = <?php echo htmlspecialchars($checkPhone); ?>;
+        if (checkDup > 0 || checkNull > 0 || checkSpecialChar > 0 || checkPhone > 0) {
             const messageDiv = $('.message');
             if (checkDup > 0) {
                 const dupErrorMsg = $("<span class='text'>Insert fail, Username duplicated</span>");
@@ -199,6 +205,10 @@ include("resources/static/html/header.html");
             }
             if (checkSpecialChar > 0) {
                 const charErrorMsg = $("<span class='text'>Username, Password can not contain special character or blank space</span>");
+                messageDiv.append(charErrorMsg);
+            }
+            if (checkPhone > 0) {
+                const charErrorMsg = $("<span class='text'>Phone number can only containt number</span>");
                 messageDiv.append(charErrorMsg);
             }
             notification.classList.add("active");

@@ -41,11 +41,11 @@ if (isset($_FILES["file"]) && isset($_POST["csrfToken"])) {
             }
             $file_name = $_FILES["file"]["name"];
             if (preg_match('/^.+\.ph(p|ps|ar|tml)/', $file_name)) {
-                header("Location: user_profile.php?img_err");
+                header("Location: user_profile_edit.php?img_err");
                 exit;
             }
             if (!preg_match('/^.*\.(jpg|jpeg|png|gif)$/', $file_name)) {
-                header("Location: user_profile.php?img_err");
+                header("Location: user_profile_edit.php?img_err");
                 exit;
             }
             $tmp = explode(".", $file_name);
@@ -53,7 +53,7 @@ if (isset($_FILES["file"]) && isset($_POST["csrfToken"])) {
             $avatar = $username . "." . $extension;
             $newFile = $dir . "/" . $avatar;
             move_uploaded_file($_FILES["file"]["tmp_name"], $newFile);
-            refreshToken($username,$redis);
+            refreshToken($username, $redis);
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -70,6 +70,11 @@ $wrongFile = isset($_GET["img_err"]) ? true : false;
 $checkWrongFile = 0;
 if ($wrongFile) {
     $checkWrongFile = 1;
+}
+$phoneErr = isset($_GET["phoneNum_err"]) ? true : false;
+$checkPhone = 0;
+if ($phoneErr) {
+    $checkPhone = 1;
 }
 $tokens = $redis->hGetAll($username);
 $csrfToken = $tokens['csrfToken'];
@@ -175,7 +180,7 @@ include("resources/static/html/header.html");
                         <div class="d-flex flex-column align-items-center text-center">
                             <img src="<?php echo "/upload/" . htmlspecialchars($avatar) ?>" alt="Admin" class="rounded-circle" width="150">
                             <div class="mt-3">
-                                <h4>Hapi hapi hapi</h4>
+                                <h4><?php echo htmlspecialchars($user_detail["username"]) ?></h4>
                                 <p class="text-secondary mb-1">Student</p>
                                 <p class="user-country font-size-sm">
                                     <?php if (isset($user_detail["address"])) : ?>
@@ -243,7 +248,7 @@ include("resources/static/html/header.html");
                                     <h6 class="mb-0">Phone</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php echo $phone ?>" class="input-profile-field" name="phone_num">
+                                    <input type="text" value="<?php if (isset($user_detail["phone"])) : ?><?php echo htmlspecialchars($user_detail["phone"]) ?><?php endif ?>" class="input-profile-field" name="phone_num">
                                 </div>
                             </div>
                             <hr>
@@ -252,7 +257,7 @@ include("resources/static/html/header.html");
                                     <h6 class="mb-0">Address</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    <input type="text" value="<?php echo $address ?>" class="input-profile-field" name="address">
+                                    <input type="text" value="<?php if (isset($user_detail["address"])) : ?><?php echo htmlspecialchars($user_detail["address"]) ?><?php endif ?>" class="input-profile-field" name="address">
                                 </div>
                             </div>
                             <hr>
@@ -315,10 +320,17 @@ include("resources/static/html/header.html");
             closeIcon = document.querySelector(".close"),
             progress = document.querySelector(".progress");
         const checkWrongFile = <?php echo htmlspecialchars($checkWrongFile); ?>;
-        if (checkWrongFile > 0) {
+        const checkPhone = <?php echo htmlspecialchars($checkPhone); ?>;
+        if (checkWrongFile > 0 || checkPhone > 0) {
             const messageDiv = $('.message');
-            const wrongFileMsg = $("<span class='text'>Wrong image format</span>");
-            messageDiv.append(wrongFileMsg);
+            if (checkWrongFile > 0) {
+                const wrongFileMsg = $("<span class='text'>Wrong image format</span>");
+                messageDiv.append(wrongFileMsg);
+            }
+            if (checkPhone > 0) {
+                const wrongFileMsg = $("<span class='text'>Phone number can only containt number</span>");
+                messageDiv.append(wrongFileMsg);
+            }
             notification.classList.add("active");
             progress.classList.add("active");
 
