@@ -39,16 +39,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // SMTP config
                 $mail->isSMTP();
-                $mail->Host = "live.smtp.mailtrap.io";
+                $mail->Host = "";
                 $mail->SMTPAuth = true;
                 $mail->Username = "api";
-                $mail->Password = "c40e79572b4c07d2d6809a3e5776b152";
+                $mail->Password = "";
                 $mail->SMTPSecure = 'tls';
                 $mail->Port = 587;
 
                 // Sender and recipient settings
-                $mail->setFrom('mailtrap@demomailtrap.com', 'Elearning Web');
-                $mail->addReplyTo('mailtrap@demomailtrap.com', 'Elearning Web');
+                $mail->setFrom('', 'Elearning Web');
+                $mail->addReplyTo('', 'Elearning Web');
                 $mail->addAddress($email, $username); // Replace with recipient's email and name
 
                 // Setting the email content
